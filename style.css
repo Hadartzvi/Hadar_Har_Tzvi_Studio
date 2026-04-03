@@ -221,7 +221,7 @@ li {
     height: 100%;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.35;
+    opacity: 0.82;
     transition: opacity 0.5s;
 }
 
@@ -271,28 +271,31 @@ li {
     /* צורת משושה */
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     backface-visibility: hidden;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* הצד הקדמי - הצבע הנוכחי */
 .hex-front {
-    background-color: var(--hex-front);
+    background-color: transparent;
+    backdrop-filter: blur(0px);
     transform: rotateY(0deg);
 }
 
-/* הצד האחורי - הצבע החדש */
 .hex-back {
-    background-color: var(--hex-back);
+    background-color: transparent;
     transform: rotateY(180deg);
+}
+
+.hexagon.flipped .hex-front {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255,255,255,0.08);
+    transform: rotateY(-180deg);
 }
 
 /* כשהמשושה "נהפך" */
 .hexagon.flipped .hex-front {
     transform: rotateY(-180deg);
 }
-.hexagon.flipped .hex-back {
-    transform: rotateY(0deg);
-}
+
 
 
 /* =====  6. תפריט צף - FAB  ===== */

@@ -18,17 +18,8 @@
    1. משתנים גלובליים ונתוני מוצרים
    ============================================================ */
 
-// המצב הנוכחי של האתר - 'sashiko' או 'tattoo'
 let currentMode = 'sashiko';
 
-/*
-  נתוני המוצרים - בפרויקט אמיתי זה יגיע משרת / API.
-  כרגע זה אובייקט JavaScript שמכיל את כל המידע על כל מוצר.
-  המפתח (key) הוא data-product-id של ה-article בHTML.
-  
-  images[] = מערך של נתיבי תמונות לגלריה.
-  פעולה: כשלוחצים על מוצר, JS מחפש כאן את הנתונים לפי ה-id.
-*/
 const PRODUCTS_DATA = {
     kit: {
         title: 'ערכת DIY סאשיקו',
@@ -68,7 +59,6 @@ const PRODUCTS_DATA = {
     },
 };
 
-// מעקב אחר תמונה נוכחית ב-modal
 let modalImages = [];
 let modalCurrentIndex = 0;
 
@@ -79,14 +69,6 @@ let modalCurrentIndex = 0;
 
 const cursor = document.getElementById('custom-cursor');
 
-/*
-  בכל תנועת עכבר - מזיזים את ה-div של העכבר.
-  clientX/Y = מיקום העכבר יחסית לחלון (לא לעמוד).
-  style.left/top = מיקום ה-div.
-  
-  הערה: השתמשנו ב-left/top ולא ב-transform translate
-  כי transform כבר מוגדר ב-CSS ל-(-50%, -50%) לצורך מרכוז.
-*/
 document.addEventListener('mousemove', (e) => {
     if (cursor) {
         cursor.style.left = e.clientX + 'px';
@@ -94,19 +76,7 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-/*
-  אנימציה בלחיצה - שונה לפי מצב:
-  - סאשיקו: פרח תפור (SVG של פרח)
-  - קעקועים: טיפת דיו (SVG של טיפה)
-  
-  הלוגיקה:
-  1. יוצרים div בנקודת הלחיצה
-  2. מוסיפים לו SVG מתאים
-  3. מוסיפים class 'click-animation' שמפעיל CSS animation
-  4. אחרי 700ms (אורך האנימציה) - מסירים את ה-div מה-DOM
-*/
 document.addEventListener('click', (e) => {
-    // לא מפעילים אנימציה בלחיצה על כפתורים/קישורים
     if (e.target.closest('button, a, .mode-switcher')) return;
 
     const el = document.createElement('div');
@@ -115,11 +85,9 @@ document.addEventListener('click', (e) => {
     el.style.top = e.clientY + 'px';
 
     if (currentMode === 'sashiko') {
-        // פרח תפור - SVG של פרח פשוט עם "תפרים"
         el.classList.add('sewn-flower');
         el.innerHTML = `
             <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- עלי כותרת - קווים מהמרכז -->
                 <line x1="25" y1="25" x2="25" y2="5"  stroke="#c9a96e" stroke-width="1.5" stroke-dasharray="2,2"/>
                 <line x1="25" y1="25" x2="25" y2="45" stroke="#c9a96e" stroke-width="1.5" stroke-dasharray="2,2"/>
                 <line x1="25" y1="25" x2="5"  y2="25" stroke="#c9a96e" stroke-width="1.5" stroke-dasharray="2,2"/>
@@ -128,172 +96,289 @@ document.addEventListener('click', (e) => {
                 <line x1="25" y1="25" x2="40" y2="40" stroke="#c9a96e" stroke-width="1.5" stroke-dasharray="2,2"/>
                 <line x1="25" y1="25" x2="40" y2="10" stroke="#c9a96e" stroke-width="1.5" stroke-dasharray="2,2"/>
                 <line x1="25" y1="25" x2="10" y2="40" stroke="#c9a96e" stroke-width="1.5" stroke-dasharray="2,2"/>
-                <!-- מרכז הפרח -->
                 <circle cx="25" cy="25" r="4" fill="#c9a96e"/>
-                <!-- עיגולים קטנים בקצות העלים -->
                 <circle cx="25" cy="6"  r="3" stroke="#c9a96e" stroke-width="1.5" fill="none"/>
                 <circle cx="25" cy="44" r="3" stroke="#c9a96e" stroke-width="1.5" fill="none"/>
                 <circle cx="6"  cy="25" r="3" stroke="#c9a96e" stroke-width="1.5" fill="none"/>
                 <circle cx="44" cy="25" r="3" stroke="#c9a96e" stroke-width="1.5" fill="none"/>
             </svg>`;
     } else {
-        // טיפת דיו
         el.classList.add('ink-drop');
         el.innerHTML = `
             <svg viewBox="0 0 40 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- גוף הטיפה -->
-                <path d="M20 2 C20 2, 35 20, 35 32 C35 41.2 28.3 48 20 48 C11.7 48 5 41.2 5 32 C5 20 20 2 20 2Z" 
+                <path d="M20 2 C20 2, 35 20, 35 32 C35 41.2 28.3 48 20 48 C11.7 48 5 41.2 5 32 C5 20 20 2 20 2Z"
                       fill="#1a1208" fill-opacity="0.85"/>
-                <!-- ברק קטן -->
                 <ellipse cx="15" cy="22" rx="3" ry="5" fill="white" fill-opacity="0.25" transform="rotate(-20 15 22)"/>
             </svg>`;
     }
 
     document.body.appendChild(el);
-
-    // מסירים את האלמנט אחרי שהאנימציה מסתיימת
     setTimeout(() => el.remove(), 700);
 });
 
 
 /* ============================================================
    3. Canvas - רקמה/סקיצה ברקע
-   
-   הלוגיקה:
-   - Canvas HTML5 = "לוח ציור" דיגיטלי שאפשר לצייר עליו ב-JS
-   - ctx = ה"עט" שמצייר על ה-canvas
-   - בגלילה למטה: מציירים יותר קווים (מצטבר)
-   - בגלילה למעלה: מוחקים קווים (מפחיתים progress)
-   
-   סאשיקו: דגם גיאומטרי של תפרים (קווים מקווקווים)
-   קעקועים: סקיצת קווים אורגנית (עקומות Bezier)
+
+   הלוגיקה של drawSashikoPattern:
+
+   א. בונים רשימת נקודות (centers[]) — רק בשוליים המסך,
+      לא על אזור התוכן המרכזי.
+
+   ב. ממיינים אותן לפי deterministicHash —
+      פונקציה שנותנת לכל נקודה מספר שנראה אקראי
+      אבל תמיד זהה לאותה נקודה (לא Math.random).
+      תוצאה: תפרים מצטיירים בו-זמנית על כל הדף.
+
+   ג. סופרים תפרים גלובלית (strokeBudget).
+      כל יחידה מורכבת מ-12 תפרים.
+      אם התקציב נגמר באמצע יחידה — מציירים חלק ממנה.
+      תחושה: מחט שזזה ברצף אחד על כל הבד.
    ============================================================ */
 
 const canvas = document.getElementById('bg-canvas');
-const ctx = canvas.getContext('2d'); // '2d' = ציור דו-ממדי
+const ctx    = canvas.getContext('2d');
 
-// progress = כמה מהרקמה/סקיצה הצטיירה (0 עד 1)
 let scrollProgress = 0;
-let lastScrollY = 0;
-let animFrame = null;
+let lastScrollY    = 0;
+let animFrame      = null;
 
 function resizeCanvas() {
-    // canvas חייב להיות בגודל החלון בדיוק
-    canvas.width = window.innerWidth;
+    canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
 }
 
-/*
-  פונקציה שמציירת את דגם הסאשיקו.
-  progress (0-1) קובע כמה מהדגם מצויר.
-  
-  סאשיקו קלאסי = דגם של משולשים / מתומנים חוזרים.
-  כאן אנחנו מציירים גריד פשוט של קווים מקווקווים שמתאים לאסתטיקה.
-*/
 function drawSashikoPattern(progress) {
     const W = canvas.width;
     const H = canvas.height;
-    
+
     ctx.clearRect(0, 0, W, H);
-    
     if (progress <= 0) return;
 
     ctx.save();
-    // setLineDash = מקווקו (תפרים)
-    ctx.setLineDash([4, 8]);
-    ctx.strokeStyle = 'rgba(201, 169, 110, 0.6)';
-    ctx.lineWidth = 1.2;
 
-    const spacing = 60;
-    const cols = Math.ceil(W / spacing) + 1;
-    const rows = Math.ceil(H / spacing) + 1;
-    const totalLines = cols + rows;
-    const visibleLines = Math.floor(totalLines * progress);
+    const THREAD = 'rgba(215, 200, 160, 0.9)';
+    const GRID   = 'rgba(180, 160, 120, 0.2)';
 
-    let drawn = 0;
+    ctx.lineCap  = 'round';
+    ctx.lineJoin = 'round';
 
-    // קווים אופקיים
-    for (let r = 0; r < rows && drawn < visibleLines; r++, drawn++) {
-        const y = r * spacing;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
+    const unit   = 58;
+    const armLen = unit * 0.34;
+    const petalR = unit * 0.17;
+
+    // --- 8 אזורים עגולים, מוגדרים באחוזים מגודל המסך ---
+    // כל אזור = { cx, cy } מרכז באחוזים, r רדיוס באחוזים
+    // האזורים עגולים = אין קצוות מלבניים קשים, הדגם "נגמר" בצורה אורגנית
+    const zones = [
+        { cx: 0.06, cy: 0.10, r: 0.16 },  // פינה שמאל עליון
+        { cx: 0.94, cy: 0.08, r: 0.14 },  // פינה ימין עליון
+        { cx: 0.04, cy: 0.52, r: 0.10 },  // שמאל אמצע
+        { cx: 0.96, cy: 0.48, r: 0.10 },  // ימין אמצע
+        { cx: 0.08, cy: 0.90, r: 0.15 },  // פינה שמאל תחתון
+        { cx: 0.92, cy: 0.92, r: 0.14 },  // פינה ימין תחתון
+        { cx: 0.48, cy: 0.04, r: 0.08 },  // מרכז עליון — קטן
+        { cx: 0.50, cy: 0.96, r: 0.08 },  // מרכז תחתון — קטן
+    ];
+
+    // ממירים אחוזים לפיקסלים בפועל
+    // r מחושב מהממד הקטן כדי שיהיה עקבי במסכים שאינם ריבועיים
+    const zonesPx = zones.map(z => ({
+        cx: z.cx * W,
+        cy: z.cy * H,
+        r:  z.r  * Math.min(W, H),
+    }));
+
+    // בודק אם נקודה נמצאת בתוך לפחות אזור אחד (מרחק אוקלידי < רדיוס)
+    function isInZone(x, y) {
+        return zonesPx.some(z => {
+            const dx = x - z.cx;
+            const dy = y - z.cy;
+            return Math.sqrt(dx * dx + dy * dy) < z.r;
+        });
     }
 
-    // קווים אלכסוניים (אסתטיקה של סאשיקו)
-    ctx.setLineDash([2, 12]);
-    ctx.strokeStyle = 'rgba(201, 169, 110, 0.3)';
-    for (let c = 0; c < cols && drawn < visibleLines; c++, drawn++) {
-        const x = c * spacing;
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x - H * 0.3, H); // אלכסון קל
-        ctx.stroke();
+    // --- בניית רשימת נקודות ---
+    const cols = Math.ceil(W / unit) + 2;
+    const rows = Math.ceil(H / unit) + 2;
+    const centers = [];
+
+    for (let r = -1; r < rows; r++) {
+        for (let c = -1; c < cols; c++) {
+            const x = c * unit;
+            const y = r * unit;
+            if (isInZone(x, y)) centers.push({ x, y, type: 'main' });
+
+            const mx = x + unit * 0.5;
+            const my = y + unit * 0.5;
+            if (isInZone(mx, my)) centers.push({ x: mx, y: my, type: 'mini' });
+        }
     }
 
-    // ריבועים קטנים בצמתים - מעניקים מראה של רקמת סאשיקו
+    // --- ערבוב דטרמיניסטי ---
+    // נותן לכל נקודה מספר קבוע שנראה אקראי — לפיזור אחיד בכל הדף
+    function deterministicHash(x, y) {
+        let h = Math.imul(Math.round(x) ^ 0xdeadbeef, 2654435761);
+        h = Math.imul(h ^ Math.round(y), 2246822519);
+        return (h >>> 0) / 0xffffffff;
+    }
+
+    centers.sort((a, b) => deterministicHash(a.x, a.y) - deterministicHash(b.x, b.y));
+
+    // --- שלב 1: קווי רשת (סימוני גיר לפני התפירה) ---
+    ctx.strokeStyle = GRID;
+    ctx.lineWidth   = 0.5;
+    ctx.setLineDash([1, unit * 0.4]);
+
+    const gridProgress = Math.min(1, progress * 2.5);
+    const visibleGrid  = Math.floor(centers.length * gridProgress);
+
+    centers.slice(0, visibleGrid).forEach(pt => {
+        if (pt.type !== 'main') return;
+        const s = 3;
+        ctx.beginPath();
+        ctx.moveTo(pt.x - s, pt.y); ctx.lineTo(pt.x + s, pt.y);
+        ctx.moveTo(pt.x, pt.y - s); ctx.lineTo(pt.x, pt.y + s);
+        ctx.stroke();
+    });
+
     ctx.setLineDash([]);
-    ctx.strokeStyle = 'rgba(201, 169, 110, 0.4)';
-    const dotProgress = Math.max(0, progress * 2 - 1); // מתחיל להצטייר ב-50%
-    const totalDots = Math.floor(cols * rows * dotProgress);
 
-    for (let i = 0; i < totalDots && i < cols * rows; i++) {
-        const c = i % cols;
-        const r = Math.floor(i / cols);
-        const cx = c * spacing;
-        const cy = r * spacing;
-        const size = 4;
-        ctx.strokeRect(cx - size/2, cy - size/2, size, size);
-    }
+    // --- שלב 2: תפר אחר תפר ---
+    // main = 5 תפרים: עיגול + 4 עלים
+    // mini = 2 תפרים: קו אופקי + קו אנכי
+    const STROKES_MAIN = 5;
+    const STROKES_MINI = 2;
+
+    const totalStrokes = centers.reduce((sum, pt) =>
+        sum + (pt.type === 'main' ? STROKES_MAIN : STROKES_MINI), 0);
+
+    const embProgress    = Math.max(0, (progress - 0.15) / 0.85);
+    const visibleStrokes = Math.floor(totalStrokes * embProgress);
+
+    let strokeBudget = visibleStrokes;
+
+    centers.forEach(pt => {
+        if (strokeBudget <= 0) return;
+        if (pt.type === 'main') {
+            drawHanaUnit(pt.x, pt.y, armLen, petalR, THREAD, 2.2, strokeBudget);
+            strokeBudget -= STROKES_MAIN;
+        } else {
+            drawMiniCross(pt.x, pt.y, armLen * 0.4, THREAD, 1.6, strokeBudget);
+            strokeBudget -= STROKES_MINI;
+        }
+    });
 
     ctx.restore();
-}
 
-/*
-  פונקציה שמציירת "סקיצת קעקוע" ברקע.
-  progress (0-1) קובע כמה קווים מצוירים.
-  
-  quadraticCurveTo = עקומת בזייה ריבועית - שני נקודות + נקודת שליטה.
-  זה נותן קווים אורגניים ועדינים כמו סקיצה.
-*/
+    // --- פונקציות ציור ---
+
+    function drawHanaUnit(cx, cy, arm, pR, color, lw, budget) {
+        ctx.strokeStyle = color;
+        ctx.lineCap = 'round';
+        let b = budget;
+
+        // עיגול מרכזי
+        if (b <= 0) return;
+        ctx.lineWidth = lw;
+        ctx.beginPath();
+        ctx.arc(cx, cy, pR, 0, Math.PI * 2);
+        ctx.stroke();
+        b--;
+
+        // 4 עלים עדשתיים — צורה לקוחה ישירות מה-SVG הרפרנס:
+        // "M0,-11 C4,-18 10,-22 0,-26 C-10,-22 -4,-18 0,-11"
+        // כל עלה = שתי קשתות bezier שיוצרות עדשה סגורה
+        const r     = pR;
+        const lh    = arm * 1.1;   // גובה העלה
+        const lw2   = arm * 0.38;  // רוחב הכיפוף
+
+        // סדר הציור: מעלה → ימין → מטה → שמאל (כמו תנועת מחט)
+        const leaves = [
+            // מעלה: M(0,-r) C(lw2,-(r+lh*0.55)) (lw2,-(r+lh*0.9)) (0,-(r+lh))
+            [0,-r,  lw2,-(r+lh*0.55),  lw2,-(r+lh*0.9),  0,-(r+lh),
+                   -lw2,-(r+lh*0.9), -lw2,-(r+lh*0.55),  0,-r],
+            // ימין
+            [r,0,  r+lh*0.55,lw2,  r+lh*0.9,lw2,  r+lh,0,
+                   r+lh*0.9,-lw2,  r+lh*0.55,-lw2,  r,0],
+            // מטה
+            [0,r,  lw2,r+lh*0.55,  lw2,r+lh*0.9,  0,r+lh,
+                  -lw2,r+lh*0.9, -lw2,r+lh*0.55,  0,r],
+            // שמאל
+            [-r,0, -(r+lh*0.55),lw2, -(r+lh*0.9),lw2, -(r+lh),0,
+                   -(r+lh*0.9),-lw2, -(r+lh*0.55),-lw2, -r,0],
+        ];
+
+        ctx.lineWidth = lw * 0.9;
+        for (const l of leaves) {
+            if (b <= 0) return;
+            ctx.beginPath();
+            // moveTo נקודת ההתחלה (על קצה העיגול)
+            ctx.moveTo(cx + l[0], cy + l[1]);
+            // צד ימני של העלה
+            ctx.bezierCurveTo(
+                cx + l[2], cy + l[3],
+                cx + l[4], cy + l[5],
+                cx + l[6], cy + l[7]
+            );
+            // צד שמאלי (חזרה)
+            ctx.bezierCurveTo(
+                cx + l[8],  cy + l[9],
+                cx + l[10], cy + l[11],
+                cx + l[12], cy + l[13]
+            );
+            ctx.stroke();
+            b--;
+        }
+    }
+
+    function drawMiniCross(cx, cy, arm, color, lw, budget) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = lw;
+        if (budget >= 1) {
+            ctx.beginPath();
+            ctx.moveTo(cx - arm, cy); ctx.lineTo(cx + arm, cy);
+            ctx.stroke();
+        }
+        if (budget >= 2) {
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - arm); ctx.lineTo(cx, cy + arm);
+            ctx.stroke();
+        }
+    }
+} 
+
 function drawTattooSketch(progress) {
     const W = canvas.width;
     const H = canvas.height;
 
     ctx.clearRect(0, 0, W, H);
-
     if (progress <= 0) return;
 
     ctx.save();
     ctx.strokeStyle = 'rgba(26, 18, 8, 0.12)';
-    ctx.lineWidth = 0.8;
-    ctx.lineCap = 'round';
+    ctx.lineWidth   = 0.8;
+    ctx.lineCap     = 'round';
 
-    // נקודות עגן לעקומות - ייתנו מראה אורגני
-    // אלה נקודות קבועות (לא אקראיות) כדי שהדגם יהיה עקבי
     const anchors = [
-        { x: W * 0.2, y: H * 0.1 },
-        { x: W * 0.5, y: H * 0.2 },
-        { x: W * 0.8, y: H * 0.05 },
-        { x: W * 0.9, y: H * 0.4 },
-        { x: W * 0.7, y: H * 0.6 },
+        { x: W * 0.2,  y: H * 0.1  },
+        { x: W * 0.5,  y: H * 0.2  },
+        { x: W * 0.8,  y: H * 0.05 },
+        { x: W * 0.9,  y: H * 0.4  },
+        { x: W * 0.7,  y: H * 0.6  },
         { x: W * 0.85, y: H * 0.85 },
-        { x: W * 0.5, y: H * 0.95 },
-        { x: W * 0.15, y: H * 0.8 },
-        { x: W * 0.1, y: H * 0.5 },
-        { x: W * 0.3, y: H * 0.35 },
-        { x: W * 0.5, y: H * 0.55 },
-        { x: W * 0.65, y: H * 0.3 },
+        { x: W * 0.5,  y: H * 0.95 },
+        { x: W * 0.15, y: H * 0.8  },
+        { x: W * 0.1,  y: H * 0.5  },
+        { x: W * 0.3,  y: H * 0.35 },
+        { x: W * 0.5,  y: H * 0.55 },
+        { x: W * 0.65, y: H * 0.3  },
     ];
 
-    const totalCurves = anchors.length - 1;
-    const visibleCurves = Math.floor(totalCurves * progress);
-
+    const visibleCurves = Math.floor((anchors.length - 1) * progress);
     for (let i = 0; i < visibleCurves; i++) {
-        const a = anchors[i];
-        const b = anchors[i + 1];
-        // נקודת שליטה לעקומה - אמצע עם הטיה
+        const a   = anchors[i];
+        const b   = anchors[i + 1];
         const cpX = (a.x + b.x) / 2 + (b.y - a.y) * 0.3;
         const cpY = (a.y + b.y) / 2 - (b.x - a.x) * 0.3;
 
@@ -302,38 +387,35 @@ function drawTattooSketch(progress) {
         ctx.quadraticCurveTo(cpX, cpY, b.x, b.y);
         ctx.stroke();
 
-        // עיגולים קטנים בנקודות - כמו "ידיות" של סקיצה
         ctx.beginPath();
         ctx.arc(a.x, a.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(26, 18, 8, 0.15)';
         ctx.fill();
     }
 
-    // צייר פרחים/עלים פשוטים - Fine Line style
     const florals = Math.floor(5 * progress);
     for (let f = 0; f < florals; f++) {
-        const a = anchors[f * 2 % anchors.length];
-        drawFineLineFloral(a.x, a.y, 30 + f * 10);
+        drawFineLineFloral(
+            anchors[f * 2 % anchors.length].x,
+            anchors[f * 2 % anchors.length].y,
+            30 + f * 10
+        );
     }
 
     ctx.restore();
 }
 
-// ציור פרח פשוט בסגנון Fine Line
 function drawFineLineFloral(cx, cy, size) {
     ctx.save();
     ctx.strokeStyle = 'rgba(26, 18, 8, 0.1)';
-    ctx.lineWidth = 0.6;
+    ctx.lineWidth   = 0.6;
 
-    const petals = 5;
-    for (let p = 0; p < petals; p++) {
-        const angle = (p / petals) * Math.PI * 2;
+    for (let p = 0; p < 5; p++) {
+        const angle = (p / 5) * Math.PI * 2;
         const x = cx + Math.cos(angle) * size;
         const y = cy + Math.sin(angle) * size;
-        
         ctx.beginPath();
         ctx.moveTo(cx, cy);
-        // עלה שמח עם bezier
         ctx.bezierCurveTo(
             cx + Math.cos(angle - 0.5) * size * 0.6,
             cy + Math.sin(angle - 0.5) * size * 0.6,
@@ -344,32 +426,22 @@ function drawFineLineFloral(cx, cy, size) {
         ctx.stroke();
     }
 
-    // מרכז הפרח
     ctx.beginPath();
     ctx.arc(cx, cy, size * 0.15, 0, Math.PI * 2);
     ctx.stroke();
-
     ctx.restore();
 }
 
-// מאזין לגלילה - מעדכן את progress ומצייר
 window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
     const maxScroll = document.body.scrollHeight - window.innerHeight;
-    
-    // progress = 0 בראש, 1 בתחתית
-    scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
-    
-    // ביטול frame קודם ותזמון חדש (אופטימיזציה לביצועים)
-    if (animFrame) cancelAnimationFrame(animFrame);
-    animFrame = requestAnimationFrame(() => {
-        drawBackground(scrollProgress);
-    });
+    scrollProgress  = maxScroll > 0 ? window.scrollY / maxScroll : 0;
 
-    lastScrollY = scrollY;
+    if (animFrame) cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(() => drawBackground(scrollProgress));
+
+    lastScrollY = window.scrollY;
 });
 
-// פונקציה מרכזית שמחליטה מה לצייר
 function drawBackground(progress) {
     if (currentMode === 'sashiko') {
         drawSashikoPattern(progress);
@@ -381,107 +453,61 @@ function drawBackground(progress) {
 
 /* ============================================================
    4. Honeycomb - מעבר בין מצבים
-   
-   הלוגיקה:
-   - מחשבים כמה משושים צריך לכסות את המסך
-   - יוצרים אותם ב-HTML דינמית
-   - מפעילים אנימציית flip בהדרגה (staggered)
-   - כל משושה מתהפך עם delay קצת שונה - אפקט גל
-   - אחרי שכולם התהפכו - מחלחים את מצב הגוף ואז "מתהפכים חזרה" 
-     (הצד האחורי שלהם כבר הוא הצבע החדש)
    ============================================================ */
 
 const honeycombOverlay = document.getElementById('honeycomb-overlay');
-const honeycombGrid = document.getElementById('honeycomb-grid');
-
-// גודל כל משושה (ב-px)
-const HEX_SIZE = 80;
+const honeycombGrid    = document.getElementById('honeycomb-grid');
+const HEX_SIZE         = 80;
 
 function buildHoneycomb() {
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    
-    // חישוב כמה עמודות ושורות צריך
-    // + 2 לשוליים
+    const W    = window.innerWidth;
+    const H    = window.innerHeight;
     const cols = Math.ceil(W / HEX_SIZE) + 2;
-    const rows = Math.ceil(H / (HEX_SIZE * 0.866)) + 2; // 0.866 = sin(60°) - יחס גובה משושה
-    
+    const rows = Math.ceil(H / (HEX_SIZE * 0.866)) + 2;
+
+    honeycombOverlay.classList.remove('active');
     honeycombGrid.innerHTML = '';
-    
-    // CSS Grid בגריד לפי מספר העמודות
+
     honeycombGrid.style.gridTemplateColumns = `repeat(${cols}, ${HEX_SIZE}px)`;
-    honeycombGrid.style.gridTemplateRows = `repeat(${rows}, ${HEX_SIZE * 0.866}px)`;
-    
-    const totalHexes = cols * rows;
+    honeycombGrid.style.gridTemplateRows    = `repeat(${rows}, ${HEX_SIZE * 0.866}px)`;
 
-    for (let i = 0; i < totalHexes; i++) {
-        const hex = document.createElement('div');
+    for (let i = 0; i < cols * rows; i++) {
+        const hex   = document.createElement('div');
         hex.className = 'hexagon';
-        
-        const front = document.createElement('div');
-        front.className = 'hex-face hex-front';
-        
-        const back = document.createElement('div');
-        back.className = 'hex-face hex-back';
-        
-        hex.appendChild(front);
-        hex.appendChild(back);
+        hex.appendChild(Object.assign(document.createElement('div'), { className: 'hex-face hex-front' }));
+        hex.appendChild(Object.assign(document.createElement('div'), { className: 'hex-face hex-back'  }));
 
-        // Offset לשורות אי-זוגיות = אפקט כוורת
         const row = Math.floor(i / cols);
-        if (row % 2 === 1) {
-            hex.style.marginRight = `-${HEX_SIZE / 2}px`;
-        }
-
-        // delay - גל מהמרכז החוצה
         const col = i % cols;
-        const distFromCenter = Math.sqrt(
-            Math.pow(col - cols / 2, 2) + 
-            Math.pow(row - rows / 2, 2)
-        );
-        hex.style.transitionDelay = `${distFromCenter * 0.04}s`;
+
+        if (row % 2 === 1) hex.style.marginRight = `-${HEX_SIZE / 2}px`;
+
+        const dist = Math.sqrt(Math.pow(col - cols / 2, 2) + Math.pow(row - rows / 2, 2));
+        hex.style.transitionDelay = `${dist * 0.025}s`;
 
         honeycombGrid.appendChild(hex);
     }
 }
 
-/*
-  הפעלת האנימציה.
-  1. בונים את המשושים
-  2. מציגים את ה-overlay
-  3. מוסיפים class 'flipped' לכל המשושים (CSS מטפל באנימציה)
-  4. אחרי שהאנימציה מסתיימת - callback
-*/
 function triggerHoneycomb(onComplete) {
     buildHoneycomb();
-    
     honeycombOverlay.classList.add('active');
 
-    // requestAnimationFrame = ממתין לframe הבא לפני שינוי ה-class
-    // בלי זה, הדפדפן עלול "לדלג" על ה-transition
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             const hexagons = honeycombGrid.querySelectorAll('.hexagon');
             hexagons.forEach(h => h.classList.add('flipped'));
-            
-            // מחשבים את הזמן הכולל של האנימציה
-            // = הdelay המקסימלי + זמן האנימציה עצמה
+
             const maxDelay = Math.max(
-                ...Array.from(hexagons).map(h => 
-                    parseFloat(h.style.transitionDelay) || 0
-                )
+                ...Array.from(hexagons).map(h => parseFloat(h.style.transitionDelay) || 0)
             );
-            
+
             setTimeout(() => {
                 if (onComplete) onComplete();
-                
-                // אחרי הcallback - מסתירים את ה-overlay
-                // ה-hex-back כבר מציג את הצבע החדש
                 setTimeout(() => {
                     hexagons.forEach(h => h.classList.remove('flipped'));
                     honeycombOverlay.classList.remove('active');
                 }, 300);
-                
             }, (maxDelay + 0.6) * 1000);
         });
     });
@@ -489,43 +515,26 @@ function triggerHoneycomb(onComplete) {
 
 
 /* ============================================================
-   5. setMode() - הפונקציה הראשית למעבר מצב
-   
-   זאת הפונקציה שמופעלת בלחיצה על כפתורי הניווט.
-   היא מנהלת את כל מה שקורה במעבר בין מצבים.
+   5. setMode()
    ============================================================ */
 
 function setMode(modeName) {
-    // אם כבר במצב הזה - לא עושים כלום
     if (modeName === currentMode) return;
-    
-    // גלילה לראש העמוד (עם אנימציה חלקה)
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // מפעילים את אנימציית המשושים
+
     triggerHoneycomb(() => {
-        // --- כל מה שכאן מתבצע בזמן שהמשושים מכסים את המסך ---
-        
         currentMode = modeName;
-        
-        // שינוי ה-class על body - זה מה שמחליף את כל הצבעים (CSS Variables)
         document.body.className = modeName + '-mode';
         document.body.setAttribute('data-mode', modeName);
-        
-        // ניקוי ה-canvas ויצירת רקע חדש
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         scrollProgress = 0;
-        
-        // עדכון טקסטים בחנות
         updateShopIntro(modeName);
-        
-        // עדכון כפתורים פעילים
         document.getElementById('btn-sashiko').classList.toggle('active', modeName === 'sashiko');
-        document.getElementById('btn-tattoo').classList.toggle('active', modeName === 'tattoo');
+        document.getElementById('btn-tattoo').classList.toggle('active',  modeName === 'tattoo');
     });
 }
 
-// עדכון טקסט ההסבר בחנות לפי מצב
 function updateShopIntro(mode) {
     const intro = document.querySelector('.shop-intro');
     if (intro) {
@@ -537,194 +546,124 @@ function updateShopIntro(mode) {
 
 
 /* ============================================================
-   6. FAB - תפריט צף
+   6. FAB
    ============================================================ */
 
-const fabMenu = document.getElementById('fab-menu');
+const fabMenu   = document.getElementById('fab-menu');
 const fabToggle = document.getElementById('fab-toggle');
 
-// פתיחה/סגירה של התפריט
 fabToggle.addEventListener('click', (e) => {
-    e.stopPropagation(); // מונע ריפוף לחלק הבא
+    e.stopPropagation();
     fabMenu.classList.toggle('open');
 });
 
-// קישורים בתפריט - גלילה חלקה וסגירת התפריט
 document.querySelectorAll('.fab-link').forEach(link => {
-    link.addEventListener('click', () => {
-        fabMenu.classList.remove('open');
-    });
+    link.addEventListener('click', () => fabMenu.classList.remove('open'));
 });
 
-// סגירה בלחיצה בכל מקום אחר
 document.addEventListener('click', (e) => {
-    if (!fabMenu.contains(e.target)) {
-        fabMenu.classList.remove('open');
-    }
+    if (!fabMenu.contains(e.target)) fabMenu.classList.remove('open');
 });
 
 
 /* ============================================================
-   7. Modal - דף מוצר
-   
-   הלוגיקה:
-   - openProduct() מקבל את ה-article element
-   - קורא את data-product-id
-   - מחפש ב-PRODUCTS_DATA
-   - ממלא את ה-modal בנתונים
-   - מפעיל גלריית תמונות
+   7. Modal
    ============================================================ */
 
 const productModal = document.getElementById('product-modal');
 
 function openProduct(articleEl) {
-    const productId = articleEl.getAttribute('data-product-id');
-    const data = PRODUCTS_DATA[productId];
-    
+    const data = PRODUCTS_DATA[articleEl.getAttribute('data-product-id')];
     if (!data) return;
-    
-    // מילוי ה-modal בנתוני המוצר
+
     document.getElementById('modal-title').textContent = data.title;
-    document.getElementById('modal-desc').textContent = data.desc;
+    document.getElementById('modal-desc').textContent  = data.desc;
     document.getElementById('modal-price').textContent = data.price;
-    
-    // הגדרת קישור וואטסאפ
-    const waLink = document.getElementById('modal-contact');
+
     const msg = encodeURIComponent(`שלום הדר! אני מעוניינת לשמוע עוד על "${data.title}"`);
-    // החלפי את XXXXXXXXX במספר שלך!
-    waLink.href = `https://wa.me/972XXXXXXXXX?text=${msg}`;
-    
-    // הגדרת גלריית תמונות
-    modalImages = data.images || [];
+    document.getElementById('modal-contact').href = `https://wa.me/972XXXXXXXXX?text=${msg}`;
+
+    modalImages       = data.images || [];
     modalCurrentIndex = 0;
     updateModalImage(0);
-    
-    // יצירת תמונות ממוזערות
+
     const thumbsContainer = document.getElementById('modal-thumbnails');
     thumbsContainer.innerHTML = '';
-    
     modalImages.forEach((src, idx) => {
-        const thumb = document.createElement('img');
-        thumb.src = src;
-        thumb.alt = `תמונה ${idx + 1}`;
+        const thumb    = document.createElement('img');
+        thumb.src      = src;
+        thumb.alt      = `תמונה ${idx + 1}`;
         thumb.className = idx === 0 ? 'active' : '';
-        thumb.onclick = () => updateModalImage(idx);
+        thumb.onclick  = () => updateModalImage(idx);
         thumbsContainer.appendChild(thumb);
     });
-    
-    // הצגת הchoice ניווט רק אם יש יותר מתמונה אחת
-    const prevBtn = document.querySelector('.gallery-nav.prev');
-    const nextBtn = document.querySelector('.gallery-nav.next');
+
     const hasMultiple = modalImages.length > 1;
-    prevBtn.style.display = hasMultiple ? 'flex' : 'none';
-    nextBtn.style.display = hasMultiple ? 'flex' : 'none';
-    
-    // פתיחת ה-modal
+    document.querySelector('.gallery-nav.prev').style.display = hasMultiple ? 'flex' : 'none';
+    document.querySelector('.gallery-nav.next').style.display = hasMultiple ? 'flex' : 'none';
+
     productModal.classList.add('open');
-    document.body.style.overflow = 'hidden'; // מונע גלילה מאחורי ה-modal
+    document.body.style.overflow = 'hidden';
 }
 
 function closeProduct() {
     productModal.classList.remove('open');
-    document.body.style.overflow = ''; // מחזירים גלילה
+    document.body.style.overflow = '';
 }
 
-// סגירה בלחיצה מחוץ ל-modal-content
 function closeProductIfOutside(e) {
-    if (e.target === productModal) {
-        closeProduct();
-    }
+    if (e.target === productModal) closeProduct();
 }
 
-// החלפת תמונה ב-modal
 function updateModalImage(index) {
-    if (modalImages.length === 0) return;
-    
-    // וידוא שה-index בגבולות (עם wrap-around)
+    if (!modalImages.length) return;
     modalCurrentIndex = ((index % modalImages.length) + modalImages.length) % modalImages.length;
-    
-    const mainImg = document.getElementById('modal-main-img');
-    mainImg.src = modalImages[modalCurrentIndex];
-    
-    // עדכון ממוזערות
+    document.getElementById('modal-main-img').src = modalImages[modalCurrentIndex];
     document.querySelectorAll('.modal-thumbnails img').forEach((img, idx) => {
         img.classList.toggle('active', idx === modalCurrentIndex);
     });
 }
 
-// ניווט בין תמונות
 function changeModalImage(direction) {
     updateModalImage(modalCurrentIndex + direction);
 }
 
-// סגירה עם Escape
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && productModal.classList.contains('open')) {
-        closeProduct();
-    }
+    if (e.key === 'Escape' && productModal.classList.contains('open')) closeProduct();
 });
 
 
 /* ============================================================
-   8. Reveal - אנימציות גלילה
-   
-   IntersectionObserver = API מובנה בדפדפן שמזהה
-   מתי אלמנט נכנס לתצוגה (ה-viewport).
-   
-   זה יותר יעיל מ-scroll event רגיל כי הדפדפן מנהל את זה
-   בthread נפרד ולא מאט את הגלילה.
-   
-   כשאלמנט עם class 'reveal' נכנס לתצוגה -
-   מוסיפים לו class 'visible' שמפעיל את transition ב-CSS.
+   8. Reveal
    ============================================================ */
 
 function initReveal() {
-    // threshold: 0.1 = 10% מהאלמנט גלויים = מפעילים
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
-                // unobserve = לא צריך לעקוב יותר, הוא כבר גלוי
                 observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.1 });
 
-    // מוסיפים class reveal לאלמנטים שרוצים לאנימציה
     document.querySelectorAll('.course-card, .product, .gallery-item, .about-container')
-        .forEach(el => {
-            el.classList.add('reveal');
-            observer.observe(el);
-        });
+        .forEach(el => { el.classList.add('reveal'); observer.observe(el); });
 }
 
 
 /* ============================================================
-   9. אתחול - DOMContentLoaded
-   
-   DOMContentLoaded = הדפדפן סיים לפרסר את ה-HTML.
-   כל הקוד שצריך לרוץ פעם אחת כשהעמוד נטען - נכנס כאן.
+   9. אתחול
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // resize canvas לגודל החלון
     resizeCanvas();
-    window.addEventListener('resize', () => {
-        resizeCanvas();
-        drawBackground(scrollProgress); // ציור מחדש אחרי שינוי גודל
-    });
-    
-    // אתחול reveal
+    window.addEventListener('resize', () => { resizeCanvas(); drawBackground(scrollProgress); });
+
     initReveal();
-    
-    // אתחול טקסט חנות
     updateShopIntro(currentMode);
-    
-    // ציור ראשוני (שקוף כי אין גלילה עדיין)
     drawBackground(0);
-    
-    // הגדרת כפתור פעיל
     document.getElementById('btn-sashiko').classList.add('active');
-    
+
     console.log('✦ סטודיו הדר - האתר נטען בהצלחה ✦');
 });
