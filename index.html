@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הדר | Sashiko & Fine Line</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="sashiko-mode" data-mode="sashiko">
+
+    <!-- עכבר מותאם אישית -->
+    <div id="custom-cursor"></div>
+    
+    <!-- אנימציה בלחיצה - מצב סאשיקו: פרח -->
+    <!-- אנימציה בלחיצה - מצב קעקועים: טיפת דיו -->
+    <!-- אלה נוצרים דינמית ב-JS -->
+
+    <!-- רקמה/סקיצה ברקע שנוצרת בגלילה -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- מסך המעבר של המשושים (Honeycomb flip) -->
+    <!--
+        זה ה"עור" שמכסה את האתר בין מצבים.
+        כל משושה הוא div נפרד עם אנימציית 3D flip.
+        הם מסודרים בגריד כמו כוורת.
+    -->
+    <div id="honeycomb-overlay">
+        <div id="honeycomb-grid"></div>
+    </div>
+
+    <!-- תפריט צף (FAB - Floating Action Button) -->
+    <!--
+        זה הכפתור הצף בפינה.
+        בלחיצה הוא פותח תפריט עם קישורים לכל חלקי האתר.
+        הוא תמיד גלוי, בכל מצב ובכל גלילה.
+    -->
+    <div id="fab-menu">
+        <button id="fab-toggle" aria-label="פתח תפריט">
+            <span class="fab-icon fab-icon-open">☰</span>
+            <span class="fab-icon fab-icon-close">✕</span>
+        </button>
+        <nav id="fab-nav">
+            <!-- הקישורים משתנים לפי מצב - JS מנהל את זה -->
+            <a href="#hero" class="fab-link" data-section="hero">🏠 ראש העמוד</a>
+            <a href="#world-section" class="fab-link sashiko-link" data-section="world">✂️ קורסים</a>
+            <a href="#world-section" class="fab-link tattoo-link" data-section="world">🖋 גלריה</a>
+            <a href="#shop" class="fab-link" data-section="shop">🛍 חנות</a>
+            <a href="#about-section" class="fab-link" data-section="about">💌 אודות</a>
+        </nav>
+    </div>
+
+    <!-- כפתורי מעבר בין מצבים -->
+    <nav class="mode-switcher">
+        <button id="btn-sashiko" onclick="setMode('sashiko')" class="btn-mode btn-sashiko">
+            ✦ עולם הסאשיקו
+        </button>
+        <div class="switcher-divider"></div>
+        <button id="btn-tattoo" onclick="setMode('tattoo')" class="btn-mode btn-tattoo">
+            ✦ עולם הקעקועים
+        </button>
+    </nav>
+
+    <!-- Hero - כותרת ראשית -->
+    <header id="hero">
+        <div class="hero-content">
+            <p class="hero-subtitle sashiko-text">רקמה יפנית מסורתית</p>
+            <p class="hero-subtitle tattoo-text">Fine Line Tattoo</p>
+            <h1 id="main-title">הדר</h1>
+            <p class="hero-tagline sashiko-text">דיוק, סבלנות, ויופי בתפר</p>
+            <p class="hero-tagline tattoo-text">קווים עדינים, רגשות עמוקים</p>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ===== מצב סאשיקו: קורסים ===== -->
+        <section id="world-section" class="content-area">
+            
+            <!-- תוכן סאשיקו -->
+            <div class="world-content sashiko-content">
+                <h2>הקורסים שלי</h2>
+                <p class="section-intro">כל קורס הוא מסע. אנחנו לא רק לומדות לתפור, אנחנו לומדות להאט.</p>
+                
+                <div class="courses-grid">
+                    <div class="course-card">
+                        <div class="course-number">01</div>
+                        <h3>סאשיקו למתחילות</h3>
+                        <p>יסודות התפר, הבד, והמחט. מושלם גם בלי ניסיון קודם.</p>
+                        <ul>
+                            <li>4 מפגשים של שעתיים</li>
+                            <li>כל החומרים כלולים</li>
+                            <li>קבוצות קטנות עד 6 משתתפות</li>
+                        </ul>
+                        <!-- 
+                            כפתור זה שולח לוואטסאפ.
+                            הקישור wa.me/972XXXXXXXXX?text=... פותח שיחה עם הודעה מוכנה מראש.
+                            שני ה-X צריכים להיות מוחלפים במספר הטלפון שלך!
+                        -->
+                        <a href="https://wa.me/972XXXXXXXXX?text=שלום%20הדר!%20אני%20מעוניינת%20להירשם%20לסדנת%20סאשיקו%20למתחילות" 
+                           target="_blank" class="cta-btn whatsapp-btn">
+                            📲 להרשמה לסדנה
+                        </a>
+                    </div>
+                    
+                    <div class="course-card">
+                        <div class="course-number">02</div>
+                        <h3>קוגורי-סאשי מתקדמות</h3>
+                        <p>טכניקות שזירה מורכבות. ליודעות סאשיקו הבסיסי שרוצות לצלול עמוק יותר.</p>
+                        <ul>
+                            <li>6 מפגשים</li>
+                            <li>עבודה על פרויקט אישי</li>
+                            <li>קהילת בוגרות פעילה</li>
+                        </ul>
+                        <a href="https://wa.me/972XXXXXXXXX?text=שלום%20הדר!%20אני%20מעוניינת%20בקורס%20קוגורי-סאשי%20המתקדם" 
+                           target="_blank" class="cta-btn whatsapp-btn">
+                            📲 לפרטים נוספים
+                        </a>
+                    </div>
+                </div>
+
+                <div class="bridge-links">
+                    <a href="#shop" class="text-link">לצפייה בערכות רקמה בחנות ←</a>
+                    <a href="#about-section" class="text-link secondary">מי אני? קראי על הסטודיו</a>
+                </div>
+            </div>
+
+            <!-- תוכן קעקועים -->
+            <div class="world-content tattoo-content">
+                <h2>תיק עבודות</h2>
+                <p class="section-intro">כל קו הוא החלטה. כל עיצוב מתחיל בשיחה.</p>
+
+                <!-- גלריית תיק עבודות -->
+                <div class="gallery-grid" id="portfolio-gallery">
+                    <!-- 
+                        כל אחד מהפריטים האלה הוא תמונה מהגלריה.
+                        class="sketch" = סקיצה פנויה לקעקוע
+                        המשתמש יכול לבקש את הסקיצה בלחיצה על הכפתור
+                    -->
+                    <div class="gallery-item">
+                        <img src="images/tattoo1.jpg" alt="פיין ליין - פרח">
+                        <div class="gallery-overlay"><span>Fine Line</span></div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/tattoo2.jpg" alt="פיין ליין - נוף">
+                        <div class="gallery-overlay"><span>Fine Line</span></div>
+                    </div>
+                    <div class="gallery-item sketch">
+                        <img src="images/sketch1.jpg" alt="סקיצה פנויה">
+                        <div class="gallery-overlay">
+                            <span>סקיצה פנויה ✦</span>
+                            <a href="https://wa.me/972XXXXXXXXX?text=שלום%20הדר!%20אני%20מעוניינת%20בסקיצה%20הפנויה" 
+                               target="_blank" class="sketch-claim-btn">לקביעת תור</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/tattoo3.jpg" alt="פיין ליין">
+                        <div class="gallery-overlay"><span>Fine Line</span></div>
+                    </div>
+                    <div class="gallery-item sketch">
+                        <img src="images/sketch2.jpg" alt="סקיצה פנויה">
+                        <div class="gallery-overlay">
+                            <span>סקיצה פנויה ✦</span>
+                            <a href="https://wa.me/972XXXXXXXXX?text=שלום%20הדר!%20אני%20מעוניינת%20בסקיצה%20הפנויה%20השנייה" 
+                               target="_blank" class="sketch-claim-btn">לקביעת תור</a>
+                        </div>
+                    </div>
+                    <div class="gallery-item">
+                        <img src="images/tattoo4.jpg" alt="פיין ליין">
+                        <div class="gallery-overlay"><span>Fine Line</span></div>
+                    </div>
+                </div>
+
+                <div class="tattoo-cta">
+                    <!-- קביעת תור לקעקוע - שולח לוואטסאפ -->
+                    <a href="https://wa.me/972XXXXXXXXX?text=שלום%20הדר!%20אני%20מעוניינת%20לקבוע%20תור%20לקעקוע" 
+                       target="_blank" class="cta-btn whatsapp-btn">
+                        📲 לקביעת תור
+                    </a>
+                </div>
+
+                <div class="bridge-links">
+                    <a href="#shop" class="text-link">להדפסי Fine Line בחנות ←</a>
+                    <a href="#about-section" class="text-link secondary">על הדר ואמנות הקעקוע</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== חנות ===== -->
+        <section id="shop" class="content-area">
+            <h2>החנות של הסטודיו</h2>
+            <p class="section-intro shop-intro">
+                <!-- הטקסט משתנה לפי מצב - JS מנהל את זה -->
+            </p>
+            
+            <div class="products-grid" id="products-grid">
+                <!--
+                    כל מוצר הוא article עם data-category.
+                    "sashiko" = מוצר ייחודי לסאשיקו
+                    "tattoo" = מוצר ייחודי לקעקועים  
+                    "shared" = מוצר משותף (יוצג בשני המצבים)
+                    
+                    בלחיצה על מוצר - נפתח modal עם גלריית תמונות ופרטים נוספים.
+                    בריחוף (hover) - התמונה מתחלפת לתמונת תקריב אם קיימת.
+                -->
+
+                <article class="product" data-category="sashiko" data-product-id="kit"
+                         onclick="openProduct(this)">
+                    <div class="product-gallery">
+                        <img src="images/kit.jpg" alt="ערכת סאשיקו" class="main-img">
+                        <img src="images/kit-detail.jpg" alt="תקריב ערכת סאשיקו" class="hover-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>ערכת DIY סאשיקו</h3>
+                        <p class="product-desc">כל מה שצריך להתחיל: בד, חוט, מחט ומדריך מצולם.</p>
+                        <span class="price">150 ₪</span>
+                    </div>
+                </article>
+
+                <article class="product" data-category="sashiko" data-product-id="bag"
+                         onclick="openProduct(this)">
+                    <div class="product-gallery">
+                        <img src="images/bag.jpg" alt="תיק רקום" class="main-img">
+                        <img src="images/bag-detail.jpg" alt="תיק רקום - תקריב" class="hover-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>תיק יד רקום</h3>
+                        <p class="product-desc">עבודת יד מקורית. כל תיק הוא יחיד במינו.</p>
+                        <span class="price">220 ₪</span>
+                    </div>
+                </article>
+
+                <article class="product" data-category="sashiko" data-product-id="belt"
+                         onclick="openProduct(this)">
+                    <div class="product-gallery">
+                        <img src="images/belt.jpg" alt="חגורה רקומה" class="main-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>חגורה ברקמה מסורתית</h3>
+                        <p class="product-desc">רקמה ידנית על בד קנבס טבעי.</p>
+                        <span class="price">280 ₪</span>
+                    </div>
+                </article>
+
+                <article class="product" data-category="tattoo" data-product-id="print1"
+                         onclick="openProduct(this)">
+                    <div class="product-gallery">
+                        <img src="images/print1.jpg" alt="הדפס קעקוע" class="main-img">
+                        <img src="images/print1-detail.jpg" alt="הדפס - תקריב" class="hover-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>הדפס Fine Line — סדרה מוגבלת</h3>
+                        <p class="product-desc">מוּדפס על נייר ארש 300 גרם, ממוסגר ברגישות.</p>
+                        <span class="price">120 ₪</span>
+                    </div>
+                </article>
+
+                <article class="product" data-category="tattoo" data-product-id="lino"
+                         onclick="openProduct(this)">
+                    <div class="product-gallery">
+                        <img src="images/lino.jpg" alt="הדפס לינולאום" class="main-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>הדפס לינולאום בעבודת יד</h3>
+                        <p class="product-desc">חיתוך ידני, הדפסה ידנית. אמנות אמיתית.</p>
+                        <span class="price">90 ₪</span>
+                    </div>
+                </article>
+
+                <article class="product" data-category="shared" data-product-id="notebook"
+                         onclick="openProduct(this)">
+                    <div class="product-gallery">
+                        <img src="images/notebook.jpg" alt="מחברת סקיצות" class="main-img">
+                    </div>
+                    <div class="product-info">
+                        <h3>מחברת סקיצות מעוצבת</h3>
+                        <p class="product-desc">לסאשיקניות ולאמניות קעקועים כאחד.</p>
+                        <span class="price">65 ₪</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ===== אודות ===== -->
+        <section id="about-section" class="content-area">
+            <div class="about-container">
+                <div class="about-image">
+                    <img src="images/hadar-work.jpg" alt="הדר בסטודיו">
+                </div>
+                <div class="about-text">
+                    <h2>נעים מאוד, אני הדר</h2>
+                    <p>אני משלבת טכניקות יפניות עתיקות עם אמנות גוף מודרנית. כל עבודה שלי — בין אם תפר בבד או קו על עור — יוצאת מאותו מקום של כוונה ודיוק.</p>
+                    <p>הסטודיו שלי הוא מקום שקט. בואי לבקר.</p>
+                    
+                    <div class="contact-actions">
+                        <!--
+                            כפתור המייל: mailto: פותח את תוכנת המייל של המשתמשת.
+                            שני ה-your@email.com צריכים להיות מוחלפים במייל שלך!
+                        -->
+                        <a href="mailto:your@email.com?subject=שלום%20הדר!&body=היי%20הדר,%0A%0Aאשמח%20לשמוע%20עוד%20על..."
+                           class="cta-btn email-btn">
+                            ✉️ שלחי לי מייל
+                        </a>
+                        <a href="https://instagram.com/hadar_hartzvi" target="_blank" class="cta-btn insta-btn">
+                            📷 אינסטגרם
+                        </a>
+                        <a href="https://wa.me/972XXXXXXXXX" target="_blank" class="cta-btn whatsapp-btn">
+                            📲 וואטסאפ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== Modal לדף מוצר ===== -->
+    <!--
+        כשלוחצים על מוצר, ה-modal הזה נפתח.
+        הוא מכיל גלריית תמונות שאפשר לגלול ביניהן,
+        תיאור מלא, ומחיר.
+        נסגר בלחיצה על X או מחוץ ל-modal.
+    -->
+    <div id="product-modal" class="modal-overlay" onclick="closeProductIfOutside(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeProduct()">✕</button>
+            
+            <!-- גלריית תמונות עם חיצי ניווט -->
+            <div class="modal-gallery">
+                <button class="gallery-nav prev" onclick="changeModalImage(-1)">‹</button>
+                <img id="modal-main-img" src="" alt="">
+                <button class="gallery-nav next" onclick="changeModalImage(1)">›</button>
+                
+                <!-- תמונות ממוזערות -->
+                <div id="modal-thumbnails" class="modal-thumbnails"></div>
+            </div>
+            
+            <div class="modal-info">
+                <h2 id="modal-title"></h2>
+                <p id="modal-desc"></p>
+                <span id="modal-price" class="modal-price"></span>
+                <a id="modal-contact" href="#" target="_blank" class="cta-btn whatsapp-btn">
+                    📲 ליצירת קשר על המוצר
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

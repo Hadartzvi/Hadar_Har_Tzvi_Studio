@@ -1,0 +1,1009 @@
+/* ============================================================
+   STYLE.CSS - אתר הסטודיו של הדר
+   
+   הארגון:
+   1. משתנים (CSS Variables) - הצבעים, הגופנים, הפרמטרים
+   2. בסיס - Reset והגדרות כלליות
+   3. עכבר מותאם
+   4. canvas הרקע
+   5. כיסוי המשושים (Honeycomb)
+   6. תפריט צף (FAB)
+   7. ניווט בין מצבים
+   8. Hero / כותרת ראשית
+   9. חלקי תוכן (קורסים, גלריה, חנות, אודות)
+   10. Modal מוצר
+   11. אנימציות
+   ============================================================ */
+
+
+/* =====  1. משתנים  ===== */
+/*
+  CSS Variables = ניתן לשנות מכאן את כל צבעי האתר.
+  כשגוף (body) מקבל class של sashiko-mode או tattoo-mode,
+  המשתנים מתעדכנים ו-CSS שמשתמש בהם מתעדכן אוטומטית.
+*/
+:root {
+    /* ברירת מחדל - סאשיקו */
+    --bg-color: #1a1208;
+    --bg-texture: url('images/bg-sashiko.jpg');
+    --accent: #c9a96e;
+    --accent-soft: rgba(201, 169, 110, 0.15);
+    --text-main: #fdfcf9;
+    --text-soft: rgba(253, 252, 249, 0.65);
+    --card-bg: rgba(253, 252, 249, 0.06);
+    --card-border: rgba(201, 169, 110, 0.25);
+    --btn-bg: #c9a96e;
+    --btn-text: #1a1208;
+    --nav-bg: rgba(26, 18, 8, 0.92);
+    --cursor-img: url('images/cursor-sashiko.png');
+    --hex-front: #1a1208;
+    --hex-back: #f5f0e8;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Noto Serif Hebrew', serif;
+    --transition-speed: 0.4s;
+}
+
+body.tattoo-mode {
+    --bg-color: #f5f0e8;
+    --bg-texture: url('images/bg-paper.jpg');
+    --accent: #1a1208;
+    --accent-soft: rgba(26, 18, 8, 0.08);
+    --text-main: #1a1208;
+    --text-soft: rgba(26, 18, 8, 0.55);
+    --card-bg: rgba(26, 18, 8, 0.04);
+    --card-border: rgba(26, 18, 8, 0.15);
+    --btn-bg: #1a1208;
+    --btn-text: #f5f0e8;
+    --nav-bg: rgba(245, 240, 232, 0.95);
+    --cursor-img: url('images/cursor-tattoo.png');
+    --hex-front: #f5f0e8;
+    --hex-back: #1a1208;
+}
+
+
+/* =====  2. בסיס  ===== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    cursor: none !important; /* תמיד עכבר מותאם */
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    background-image: var(--bg-texture);
+    background-size: 400px;
+    background-repeat: repeat;
+    color: var(--text-main);
+    min-height: 100vh;
+    transition: 
+        background-color var(--transition-speed),
+        color var(--transition-speed);
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+}
+
+h2 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5em;
+    color: var(--text-main);
+}
+
+h3 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--text-main);
+}
+
+p {
+    line-height: 1.8;
+    color: var(--text-soft);
+}
+
+li {
+    color: var(--text-soft);
+    line-height: 2;
+}
+
+.content-area {
+    padding: 100px 8%;
+    min-height: 80vh;
+    position: relative;
+    z-index: 1;
+}
+
+.section-intro {
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    font-style: italic;
+}
+
+
+/* =====  3. עכבר מותאם  ===== */
+/*
+  העכבר הוא div שזזה עם ה-mousemove event ב-JS.
+  pointer-events: none = הוא לא חוסם לחיצות.
+  transform: translate(-50%, -50%) = מרכז את התמונה על הסמן.
+*/
+#custom-cursor {
+    position: fixed;
+    width: 36px;
+    height: 36px;
+    background-image: var(--cursor-img);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%);
+    transition: 
+        background-image 0.3s,
+        transform 0.1s;
+    /* תנועה חלקה יותר */
+    will-change: left, top;
+}
+
+/* אנימציית לחיצה - טיפת דיו / פרח */
+/* נוצרות ב-JS ומוסרות אחרי האנימציה */
+.click-animation {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999998;
+    transform: translate(-50%, -50%);
+    animation: clickAnim 0.7s ease-out forwards;
+}
+
+@keyframes clickAnim {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.3);
+    }
+    60% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -70%) scale(1.2);
+    }
+}
+
+/* טיפת דיו - SVG קטן שנוצר ב-JS */
+.ink-drop {
+    width: 40px;
+    height: 40px;
+}
+
+/* פרח תפור - SVG קטן שנוצר ב-JS */
+.sewn-flower {
+    width: 50px;
+    height: 50px;
+}
+
+
+/* =====  4. Canvas רקע  ===== */
+/*
+  ה-canvas מציג רקמה / סקיצה שמצטיירת בזמן גלילה.
+  הוא מאחורי כל התוכן (z-index נמוך).
+  pointer-events: none = לא חוסם אינטראקציות.
+*/
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    transition: opacity 0.5s;
+}
+
+
+/* =====  5. כיסוי המשושים - Honeycomb Overlay  ===== */
+/*
+  רשת המשושים שמכסה את האתר בין מצבים.
+  כל משושה הוא div עם אנימציית flip 3D.
+  
+  CSS clip-path: polygon() יוצר צורת משושה.
+  perspective על ה-parent מאפשר אפקט 3D.
+*/
+#honeycomb-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9000;
+    pointer-events: none;
+    /* ברירת מחדל - מוסתר */
+    visibility: hidden;
+}
+
+#honeycomb-overlay.active {
+    visibility: visible;
+    pointer-events: all;
+}
+
+#honeycomb-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    /* הגריד מוגדר ב-JS לפי גודל המסך */
+}
+
+.hexagon {
+    position: relative;
+    /* perspective על כל משושה לאפקט 3D */
+    perspective: 400px;
+    transform-style: preserve-3d;
+}
+
+.hex-face {
+    position: absolute;
+    inset: 0;
+    /* צורת משושה */
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    backface-visibility: hidden;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* הצד הקדמי - הצבע הנוכחי */
+.hex-front {
+    background-color: var(--hex-front);
+    transform: rotateY(0deg);
+}
+
+/* הצד האחורי - הצבע החדש */
+.hex-back {
+    background-color: var(--hex-back);
+    transform: rotateY(180deg);
+}
+
+/* כשהמשושה "נהפך" */
+.hexagon.flipped .hex-front {
+    transform: rotateY(-180deg);
+}
+.hexagon.flipped .hex-back {
+    transform: rotateY(0deg);
+}
+
+
+/* =====  6. תפריט צף - FAB  ===== */
+/*
+  FAB = Floating Action Button.
+  הכפתור תמיד גלוי בפינת המסך.
+  בלחיצה, div#fab-nav מתגלה עם קישורי ניווט.
+*/
+#fab-menu {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* RTL - שמאל זה ימין בפועל */
+    z-index: 8000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#fab-toggle {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    background: var(--nav-bg);
+    color: var(--text-main);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 
+        background var(--transition-speed),
+        transform 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+#fab-toggle:hover {
+    transform: scale(1.1);
+}
+
+.fab-icon {
+    position: absolute;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.fab-icon-close {
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+/* כשהתפריט פתוח */
+#fab-menu.open .fab-icon-open {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+#fab-menu.open .fab-icon-close {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+#fab-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    
+    /* מוסתר כברירת מחדל */
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    pointer-events: none;
+    transition: 
+        opacity 0.3s,
+        transform 0.3s;
+}
+
+#fab-menu.open #fab-nav {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.fab-link {
+    display: block;
+    padding: 8px 16px;
+    background: var(--nav-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    transition: background 0.2s;
+    backdrop-filter: blur(10px);
+}
+
+.fab-link:hover {
+    background: var(--accent-soft);
+}
+
+/* הצגה/הסתרה לפי מצב */
+.fab-link.sashiko-link { display: none; }
+.fab-link.tattoo-link { display: none; }
+body.sashiko-mode .fab-link.sashiko-link { display: block; }
+body.tattoo-mode .fab-link.tattoo-link { display: block; }
+
+
+/* =====  7. ניווט בין מצבים  ===== */
+
+.mode-switcher {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    padding: 0;
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    transition: background var(--transition-speed);
+}
+
+.btn-mode {
+    padding: 16px 40px;
+    border: none;
+    background: transparent;
+    color: var(--text-soft);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    transition: 
+        color 0.3s,
+        background 0.3s;
+    flex: 1;
+    max-width: 260px;
+}
+
+.btn-mode:hover {
+    color: var(--text-main);
+    background: var(--accent-soft);
+}
+
+/* כפתור פעיל - מסומן */
+body.sashiko-mode .btn-sashiko,
+body.tattoo-mode .btn-tattoo {
+    color: var(--text-main);
+    border-bottom: 2px solid var(--accent);
+}
+
+.switcher-divider {
+    width: 1px;
+    height: 30px;
+    background: var(--card-border);
+}
+
+
+/* =====  8. Hero  ===== */
+
+#hero {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    padding: 60px 5%;
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.hero-subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    transition: opacity 0.4s;
+}
+
+#main-title {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 12vw, 9rem);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--text-main);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+}
+
+.hero-tagline {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-soft);
+    transition: opacity 0.4s;
+}
+
+/* הצגה/הסתרה של טקסטים לפי מצב */
+.sashiko-text, .tattoo-text { display: none; }
+body.sashiko-mode .sashiko-text { display: block; }
+body.tattoo-mode .tattoo-text { display: block; }
+
+
+/* =====  9. תוכן - קורסים, גלריה, חנות, אודות  ===== */
+
+/* --- תוכן עולמות --- */
+.world-content {
+    display: none;
+}
+body.sashiko-mode .sashiko-content { display: block; }
+body.tattoo-mode .tattoo-content { display: block; }
+
+/* --- קורסים --- */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 3rem 0;
+}
+
+.course-card {
+    border: 1px solid var(--card-border);
+    padding: 40px;
+    background: var(--card-bg);
+    backdrop-filter: blur(6px);
+    position: relative;
+    transition: 
+        border-color 0.3s,
+        transform 0.3s;
+}
+
+.course-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+}
+
+.course-number {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    color: var(--accent);
+    opacity: 0.3;
+    position: absolute;
+    top: 20px;
+    left: 30px; /* RTL */
+    line-height: 1;
+}
+
+.course-card h3 {
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+}
+
+.course-card ul {
+    list-style: none;
+    margin: 1.5rem 0;
+}
+
+.course-card li::before {
+    content: "✦ ";
+    color: var(--accent);
+    font-size: 0.7em;
+}
+
+/* --- גלריית קעקועים --- */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 4px;
+    margin: 3rem 0;
+}
+
+.gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--card-bg);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+.gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: white;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+/* סקיצות פנויות - border מיוחד */
+.gallery-item.sketch {
+    border: 2px solid var(--accent);
+}
+
+.sketch-claim-btn {
+    padding: 8px 20px;
+    border: 1px solid white;
+    color: white;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+    font-family: var(--font-body);
+}
+
+.sketch-claim-btn:hover {
+    background: white;
+    color: black;
+}
+
+/* --- חנות --- */
+
+/* בחנות, מוצרים מסוננים לפי מצב */
+.product[data-category="sashiko"] { display: none; }
+.product[data-category="tattoo"] { display: none; }
+.product[data-category="shared"] { display: none; }
+
+body.sashiko-mode .product[data-category="sashiko"],
+body.sashiko-mode .product[data-category="shared"] { display: flex; }
+
+body.tattoo-mode .product[data-category="tattoo"],
+body.tattoo-mode .product[data-category="shared"] { display: flex; }
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 3rem;
+}
+
+.product {
+    flex-direction: column;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    overflow: hidden;
+    transition: 
+        border-color 0.3s,
+        transform 0.3s,
+        box-shadow 0.3s;
+    cursor: pointer !important; /* override none */
+}
+
+.product:hover {
+    border-color: var(--accent);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* גלריית תמונות - הצגת hover image */
+.product-gallery {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+}
+
+.product-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s, transform 0.5s;
+}
+
+.product-gallery .hover-img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}
+
+.product:hover .product-gallery .main-img {
+    opacity: 0;
+}
+
+.product:hover .product-gallery .hover-img {
+    opacity: 1;
+}
+
+.product:hover .product-gallery img {
+    transform: scale(1.03);
+}
+
+/* כשאין hover-img, רק zoom */
+.product:hover .product-gallery:not(:has(.hover-img)) img {
+    transform: scale(1.08);
+}
+
+.product-info {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-desc {
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.price {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--accent);
+    display: block;
+    margin-top: auto;
+}
+
+/* --- כפתורי CTA --- */
+.cta-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    transition: 
+        background 0.3s,
+        color 0.3s,
+        transform 0.2s;
+    margin-top: 1.5rem;
+}
+
+.cta-btn:hover {
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    transform: translateY(-2px);
+}
+
+.whatsapp-btn { border-color: #25d366; }
+.whatsapp-btn:hover { background: #25d366; color: white; }
+.email-btn { border-color: var(--accent); }
+.insta-btn { border-color: #c13584; }
+.insta-btn:hover { background: #c13584; color: white; }
+
+/* קישורי טקסט */
+.text-link {
+    color: var(--accent);
+    font-size: 0.9rem;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+    margin-left: 2rem; /* RTL: margin-left = רווח ימינה */
+}
+
+.text-link:hover {
+    border-color: var(--accent);
+}
+
+.text-link.secondary {
+    color: var(--text-soft);
+}
+
+.bridge-links {
+    margin-top: 3rem;
+}
+
+.tattoo-cta {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+/* --- אודות --- */
+.about-container {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1000px;
+}
+
+.about-image {
+    position: relative;
+}
+
+.about-image img {
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: 3/4;
+    filter: grayscale(30%);
+    transition: filter 0.5s;
+}
+
+.about-image:hover img {
+    filter: grayscale(0%);
+}
+
+.about-text h2 {
+    margin-bottom: 1.5rem;
+}
+
+.about-text p {
+    margin-bottom: 1rem;
+}
+
+.contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 2rem;
+}
+
+.contact-actions .cta-btn {
+    margin-top: 0;
+}
+
+
+/* =====  10. Modal מוצר  ===== */
+/*
+  Modal = חלון קופץ.
+  .modal-overlay = הרקע השחוף - לחיצה עליו סוגרת את החלון.
+  .modal-content = התוכן עצמו.
+*/
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    
+    /* מוסתר כברירת מחדל */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: var(--bg-color);
+    border: 1px solid var(--card-border);
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+}
+
+.modal-overlay.open .modal-content {
+    transform: translateY(0);
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px; /* RTL */
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    z-index: 1;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--accent-soft);
+}
+
+.modal-gallery {
+    position: relative;
+    background: #000;
+}
+
+.modal-gallery #modal-main-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+}
+
+/* חיצי ניווט בגלריה */
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.gallery-nav:hover { background: rgba(0,0,0,0.8); }
+.gallery-nav.prev { right: auto; left: 10px; }
+.gallery-nav.next { left: auto; right: 10px; }
+
+/* תמונות ממוזערות */
+.modal-thumbnails {
+    display: flex;
+    gap: 6px;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    overflow-x: auto;
+}
+
+.modal-thumbnails img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.modal-thumbnails img.active { opacity: 1; border: 2px solid var(--accent); }
+.modal-thumbnails img:hover { opacity: 0.9; }
+
+.modal-info {
+    padding: 50px 35px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-info h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.modal-price {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--accent);
+    display: block;
+    margin: 1rem 0;
+}
+
+.modal-info .cta-btn {
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+
+/* =====  11. אנימציות  ===== */
+
+/* Reveal בגלילה - אלמנטים נכנסים לתצוגה */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: 
+        opacity 0.7s ease,
+        transform 0.7s ease;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* pulse עדין על ה-accent */
+@keyframes pulse-accent {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.sketch-claim-btn {
+    animation: pulse-accent 2s infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .content-area { padding: 60px 5%; }
+    .about-container { grid-template-columns: 1fr; gap: 40px; }
+    .modal-content { grid-template-columns: 1fr; }
+    .courses-grid { grid-template-columns: 1fr; }
+    #main-title { font-size: clamp(3.5rem, 15vw, 7rem); }
+    .btn-mode { padding: 14px 20px; font-size: 0.8rem; }
+}
+
+@media (max-width: 480px) {
+    .mode-switcher { flex-wrap: wrap; }
+    .switcher-divider { display: none; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .products-grid { grid-template-columns: 1fr; }
+}
