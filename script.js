@@ -356,79 +356,358 @@ function drawTattooSketch(progress) {
     if (progress <= 0) return;
 
     ctx.save();
-    ctx.strokeStyle = 'rgba(26, 18, 8, 0.12)';
-    ctx.lineWidth   = 0.8;
-    ctx.lineCap     = 'round';
+    ctx.lineCap  = 'round';
+    ctx.lineJoin = 'round';
 
-    const anchors = [
-        { x: W * 0.2,  y: H * 0.1  },
-        { x: W * 0.5,  y: H * 0.2  },
-        { x: W * 0.8,  y: H * 0.05 },
-        { x: W * 0.9,  y: H * 0.4  },
-        { x: W * 0.7,  y: H * 0.6  },
-        { x: W * 0.85, y: H * 0.85 },
-        { x: W * 0.5,  y: H * 0.95 },
-        { x: W * 0.15, y: H * 0.8  },
-        { x: W * 0.1,  y: H * 0.5  },
-        { x: W * 0.3,  y: H * 0.35 },
-        { x: W * 0.5,  y: H * 0.55 },
-        { x: W * 0.65, y: H * 0.3  },
+    // צבע: שחור עדין על הרקע הבהיר של מצב קעקועים
+    const INK = 'rgba(20, 14, 8, 0.82)';
+
+    // ============================================================
+    // הפרחים מוגדרים כ"פקודות עט" — רשימת צעדים מסודרים.
+    // כל פקודה היא אחת מאלה:
+    //   { t:'move', x, y }  — הרם עט, עבור לנקודה
+    //   { t:'line', x, y }  — קו לנקודה הבאה
+    //   { t:'arc',  x, y, r } — עיגול מלא
+    //
+    // progress קובע כמה פקודות מצטיירות.
+    // הפקודה האחרונה מצטיירת חלקית (fraction) —
+    // זה נותן תחושת מחט שזזה ברצף.
+    // ============================================================
+
+    // --- א. פרח עליון ---
+    // paths מ-tattoo_elements_preview.svg, מצויירים כפקודות
+    function makeFlowerTop(ox, oy, sc) {
+        return [
+            // עלה מרכזי
+            { t:'move', x:ox,        y:oy-85*sc },
+            { t:'line', x:ox+6*sc,   y:oy-65*sc },
+            { t:'line', x:ox+8*sc,   y:oy-45*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox-8*sc,   y:oy-45*sc },
+            { t:'line', x:ox-6*sc,   y:oy-65*sc },
+            { t:'line', x:ox,        y:oy-85*sc },
+            // עלה שמאל-1
+            { t:'move', x:ox-18*sc,  y:oy-80*sc },
+            { t:'line', x:ox-8*sc,   y:oy-62*sc },
+            { t:'line', x:ox-4*sc,   y:oy-44*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox-12*sc,  y:oy-38*sc },
+            { t:'line', x:ox-20*sc,  y:oy-54*sc },
+            { t:'line', x:ox-18*sc,  y:oy-80*sc },
+            // עלה ימין-1
+            { t:'move', x:ox+18*sc,  y:oy-80*sc },
+            { t:'line', x:ox+8*sc,   y:oy-62*sc },
+            { t:'line', x:ox+4*sc,   y:oy-44*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox+12*sc,  y:oy-38*sc },
+            { t:'line', x:ox+20*sc,  y:oy-54*sc },
+            { t:'line', x:ox+18*sc,  y:oy-80*sc },
+            // עלה שמאל-2
+            { t:'move', x:ox-34*sc,  y:oy-68*sc },
+            { t:'line', x:ox-16*sc,  y:oy-55*sc },
+            { t:'line', x:ox-6*sc,   y:oy-40*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox-14*sc,  y:oy-32*sc },
+            { t:'line', x:ox-28*sc,  y:oy-42*sc },
+            { t:'line', x:ox-34*sc,  y:oy-68*sc },
+            // עלה ימין-2
+            { t:'move', x:ox+34*sc,  y:oy-68*sc },
+            { t:'line', x:ox+16*sc,  y:oy-55*sc },
+            { t:'line', x:ox+6*sc,   y:oy-40*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox+14*sc,  y:oy-32*sc },
+            { t:'line', x:ox+28*sc,  y:oy-42*sc },
+            { t:'line', x:ox+34*sc,  y:oy-68*sc },
+            // עלה שמאל-3
+            { t:'move', x:ox-44*sc,  y:oy-50*sc },
+            { t:'line', x:ox-24*sc,  y:oy-44*sc },
+            { t:'line', x:ox-10*sc,  y:oy-34*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox-12*sc,  y:oy-24*sc },
+            { t:'line', x:ox-30*sc,  y:oy-28*sc },
+            { t:'line', x:ox-44*sc,  y:oy-50*sc },
+            // עלה ימין-3
+            { t:'move', x:ox+44*sc,  y:oy-50*sc },
+            { t:'line', x:ox+24*sc,  y:oy-44*sc },
+            { t:'line', x:ox+10*sc,  y:oy-34*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox+12*sc,  y:oy-24*sc },
+            { t:'line', x:ox+30*sc,  y:oy-28*sc },
+            { t:'line', x:ox+44*sc,  y:oy-50*sc },
+            // עיגול מרכזי
+            { t:'arc',  x:ox,        y:oy-30*sc,  r:7*sc  },
+            { t:'arc',  x:ox,        y:oy-30*sc,  r:3*sc, fill:true },
+            // גבעול
+            { t:'move', x:ox,        y:oy-23*sc },
+            { t:'line', x:ox+2*sc,   y:oy-12*sc },
+            { t:'line', x:ox+2*sc,   y:oy      },
+            { t:'line', x:ox,        y:oy+8*sc  },
+            // עלי גבעול
+            { t:'move', x:ox,        y:oy-10*sc },
+            { t:'line', x:ox-10*sc,  y:oy-8*sc  },
+            { t:'line', x:ox-16*sc,  y:oy-2*sc  },
+            { t:'line', x:ox-14*sc,  y:oy+6*sc  },
+            { t:'move', x:ox,        y:oy-10*sc },
+            { t:'line', x:ox+10*sc,  y:oy-8*sc  },
+            { t:'line', x:ox+16*sc,  y:oy-2*sc  },
+            { t:'line', x:ox+14*sc,  y:oy+6*sc  },
+        ];
+    }
+
+    // --- ב. כתר זר ---
+    // paths מ-three_flowers_precise.svg
+    function makeKeterZar(ox, oy, sc) {
+        return [
+            // גבעול מרכזי
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox,        y:oy+20*sc },
+            { t:'line', x:ox,        y:oy-30*sc },
+            { t:'line', x:ox,        y:oy-80*sc },
+            { t:'arc',  x:ox,        y:oy-80*sc,  r:5*sc  },
+            // גבעול שמאל-1
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox-8*sc,   y:oy+20*sc },
+            { t:'line', x:ox-18*sc,  y:oy-20*sc },
+            { t:'line', x:ox-24*sc,  y:oy-70*sc },
+            { t:'arc',  x:ox-24*sc,  y:oy-70*sc,  r:4.5*sc},
+            // גבעול ימין-1
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox+8*sc,   y:oy+20*sc },
+            { t:'line', x:ox+18*sc,  y:oy-20*sc },
+            { t:'line', x:ox+24*sc,  y:oy-70*sc },
+            { t:'arc',  x:ox+24*sc,  y:oy-70*sc,  r:4.5*sc},
+            // גבעול שמאל-2
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox-14*sc,  y:oy+24*sc },
+            { t:'line', x:ox-30*sc,  y:oy-10*sc },
+            { t:'line', x:ox-44*sc,  y:oy-56*sc },
+            { t:'arc',  x:ox-44*sc,  y:oy-56*sc,  r:4*sc  },
+            // גבעול ימין-2
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox+14*sc,  y:oy+24*sc },
+            { t:'line', x:ox+30*sc,  y:oy-10*sc },
+            { t:'line', x:ox+44*sc,  y:oy-56*sc },
+            { t:'arc',  x:ox+44*sc,  y:oy-56*sc,  r:4*sc  },
+            // גבעול שמאל-3
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox-18*sc,  y:oy+28*sc },
+            { t:'line', x:ox-40*sc,  y:oy+4*sc  },
+            { t:'line', x:ox-60*sc,  y:oy-30*sc },
+            { t:'arc',  x:ox-60*sc,  y:oy-30*sc,  r:3.5*sc},
+            // גבעול ימין-3
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox+18*sc,  y:oy+28*sc },
+            { t:'line', x:ox+40*sc,  y:oy+4*sc  },
+            { t:'line', x:ox+60*sc,  y:oy-30*sc },
+            { t:'arc',  x:ox+60*sc,  y:oy-30*sc,  r:3.5*sc},
+            // גביע בסיס
+            { t:'move', x:ox-22*sc,  y:oy+60*sc },
+            { t:'line', x:ox-18*sc,  y:oy+72*sc },
+            { t:'line', x:ox-10*sc,  y:oy+80*sc },
+            { t:'line', x:ox,        y:oy+82*sc },
+            { t:'line', x:ox+10*sc,  y:oy+80*sc },
+            { t:'line', x:ox+18*sc,  y:oy+72*sc },
+            { t:'line', x:ox+22*sc,  y:oy+60*sc },
+            // קווי גביע פנימיים
+            { t:'move', x:ox-22*sc,  y:oy+60*sc },
+            { t:'line', x:ox-16*sc,  y:oy+66*sc },
+            { t:'line', x:ox-8*sc,   y:oy+72*sc },
+            { t:'line', x:ox,        y:oy+74*sc },
+            { t:'move', x:ox+22*sc,  y:oy+60*sc },
+            { t:'line', x:ox+16*sc,  y:oy+66*sc },
+            { t:'line', x:ox+8*sc,   y:oy+72*sc },
+            { t:'line', x:ox,        y:oy+74*sc },
+            // שיניים
+            { t:'move', x:ox-22*sc,  y:oy+60*sc },
+            { t:'line', x:ox-26*sc,  y:oy+54*sc },
+            { t:'line', x:ox-24*sc,  y:oy+48*sc },
+            { t:'line', x:ox-18*sc,  y:oy+50*sc },
+            { t:'move', x:ox+22*sc,  y:oy+60*sc },
+            { t:'line', x:ox+26*sc,  y:oy+54*sc },
+            { t:'line', x:ox+24*sc,  y:oy+48*sc },
+            { t:'line', x:ox+18*sc,  y:oy+50*sc },
+            { t:'move', x:ox,        y:oy+60*sc },
+            { t:'line', x:ox,        y:oy+54*sc },
+            { t:'line', x:ox+2*sc,   y:oy+50*sc },
+            { t:'line', x:ox,        y:oy+48*sc },
+        ];
+    }
+
+    // --- ג. לוטוס + סלסולים ---
+    // paths מ-tattoo_elements_preview.svg
+    function makeLotus(ox, oy, sc) {
+        return [
+            // עלה מרכזי
+            { t:'move', x:ox,        y:oy-60*sc },
+            { t:'line', x:ox+8*sc,   y:oy-44*sc },
+            { t:'line', x:ox+10*sc,  y:oy-28*sc },
+            { t:'line', x:ox,        y:oy-18*sc },
+            { t:'line', x:ox-10*sc,  y:oy-28*sc },
+            { t:'line', x:ox-8*sc,   y:oy-44*sc },
+            { t:'line', x:ox,        y:oy-60*sc },
+            // עלה שמאל
+            { t:'move', x:ox-22*sc,  y:oy-52*sc },
+            { t:'line', x:ox-10*sc,  y:oy-38*sc },
+            { t:'line', x:ox-6*sc,   y:oy-24*sc },
+            { t:'line', x:ox,        y:oy-18*sc },
+            { t:'line', x:ox-10*sc,  y:oy-20*sc },
+            { t:'line', x:ox-22*sc,  y:oy-30*sc },
+            { t:'line', x:ox-22*sc,  y:oy-52*sc },
+            // עלה ימין
+            { t:'move', x:ox+22*sc,  y:oy-52*sc },
+            { t:'line', x:ox+10*sc,  y:oy-38*sc },
+            { t:'line', x:ox+6*sc,   y:oy-24*sc },
+            { t:'line', x:ox,        y:oy-18*sc },
+            { t:'line', x:ox+10*sc,  y:oy-20*sc },
+            { t:'line', x:ox+22*sc,  y:oy-30*sc },
+            { t:'line', x:ox+22*sc,  y:oy-52*sc },
+            // עלה שמאל-2
+            { t:'move', x:ox-36*sc,  y:oy-36*sc },
+            { t:'line', x:ox-22*sc,  y:oy-28*sc },
+            { t:'line', x:ox-10*sc,  y:oy-18*sc },
+            { t:'line', x:ox-8*sc,   y:oy-14*sc },
+            { t:'line', x:ox-24*sc,  y:oy-14*sc },
+            { t:'line', x:ox-36*sc,  y:oy-36*sc },
+            // עלה ימין-2
+            { t:'move', x:ox+36*sc,  y:oy-36*sc },
+            { t:'line', x:ox+22*sc,  y:oy-28*sc },
+            { t:'line', x:ox+10*sc,  y:oy-18*sc },
+            { t:'line', x:ox+8*sc,   y:oy-14*sc },
+            { t:'line', x:ox+24*sc,  y:oy-14*sc },
+            { t:'line', x:ox+36*sc,  y:oy-36*sc },
+            // עיגול מרכזי
+            { t:'arc',  x:ox,        y:oy-18*sc,  r:6*sc  },
+            // גבעול
+            { t:'move', x:ox,        y:oy-12*sc },
+            { t:'line', x:ox,        y:oy+10*sc  },
+            // עלי מים שמאל
+            { t:'move', x:ox,        y:oy      },
+            { t:'line', x:ox-12*sc,  y:oy+2*sc  },
+            { t:'line', x:ox-20*sc,  y:oy+8*sc  },
+            { t:'line', x:ox-18*sc,  y:oy+16*sc },
+            // עלי מים ימין
+            { t:'move', x:ox,        y:oy      },
+            { t:'line', x:ox+12*sc,  y:oy+2*sc  },
+            { t:'line', x:ox+20*sc,  y:oy+8*sc  },
+            { t:'line', x:ox+18*sc,  y:oy+16*sc },
+            // סלסול שמאל
+            { t:'move', x:ox-18*sc,  y:oy+16*sc },
+            { t:'line', x:ox-28*sc,  y:oy+20*sc },
+            { t:'line', x:ox-38*sc,  y:oy+16*sc },
+            { t:'line', x:ox-40*sc,  y:oy+8*sc  },
+            { t:'line', x:ox-36*sc,  y:oy+2*sc  },  // { t:-6
+            { t:'line', x:ox-28*sc,  y:oy+4*sc  },
+            { t:'line', x:ox-20*sc,  y:oy+6*sc  },
+            { t:'line', x:ox-22*sc,  y:oy+10*sc },
+            // סלסול ימין
+            { t:'move', x:ox+18*sc,  y:oy+16*sc },
+            { t:'line', x:ox+28*sc,  y:oy+20*sc },
+            { t:'line', x:ox+38*sc,  y:oy+16*sc },
+            { t:'line', x:ox+40*sc,  y:oy+8*sc  },
+            { t:'line', x:ox+36*sc,  y:oy+2*sc  },
+            { t:'line', x:ox+28*sc,  y:oy+4*sc  },
+            { t:'line', x:ox+20*sc,  y:oy+6*sc  },
+            { t:'line', x:ox+22*sc,  y:oy+10*sc },
+            // כפתור תחתון
+            { t:'move', x:ox-8*sc,   y:oy+10*sc },
+            { t:'line', x:ox-6*sc,   y:oy+18*sc },
+            { t:'line', x:ox-4*sc,   y:oy+24*sc },
+            { t:'line', x:ox,        y:oy+28*sc },
+            { t:'line', x:ox+4*sc,   y:oy+24*sc },
+            { t:'line', x:ox+6*sc,   y:oy+18*sc },
+            { t:'line', x:ox+8*sc,   y:oy+10*sc },
+            { t:'move', x:ox-12*sc,  y:oy+12*sc },
+            { t:'line', x:ox-12*sc,  y:oy+22*sc },
+            { t:'line', x:ox-8*sc,   y:oy+28*sc },
+            { t:'line', x:ox,        y:oy+32*sc },
+            { t:'line', x:ox+8*sc,   y:oy+28*sc },
+            { t:'line', x:ox+12*sc,  y:oy+22*sc },
+            { t:'line', x:ox+12*sc,  y:oy+12*sc },
+            { t:'arc',  x:ox,        y:oy+28*sc,  r:4*sc  },
+        ];
+    }
+
+    // ============================================================
+    // מיקום הפרחים על המסך — 6 מיקומים:
+    // פרח עליון: פינות עליונות (שמאל וימין)
+    // כתר זר: שוליים צדדיים (שמאל וימין, אמצע)
+    // לוטוס: פינות תחתונות (שמאל וימין)
+    // ============================================================
+    const sc = Math.min(W, H) * 0.0014; // scale לפי גודל המסך
+
+    const elements = [
+        // פרח עליון — פינה שמאל עליון
+        { strokes: makeFlowerTop(W*0.08, H*0.16, sc) },
+        // פרח עליון — פינה ימין עליון
+        { strokes: makeFlowerTop(W*0.92, H*0.16, sc) },
+        // כתר זר — שמאל אמצע
+        { strokes: makeKeterZar( W*0.06, H*0.52, sc) },
+        // כתר זר — ימין אמצע
+        { strokes: makeKeterZar( W*0.94, H*0.52, sc) },
+        // לוטוס — פינה שמאל תחתון
+        { strokes: makeLotus(    W*0.08, H*0.82, sc) },
+        // לוטוס — פינה ימין תחתון
+        { strokes: makeLotus(    W*0.92, H*0.82, sc) },
     ];
 
-    const visibleCurves = Math.floor((anchors.length - 1) * progress);
-    for (let i = 0; i < visibleCurves; i++) {
-        const a   = anchors[i];
-        const b   = anchors[i + 1];
-        const cpX = (a.x + b.x) / 2 + (b.y - a.y) * 0.3;
-        const cpY = (a.y + b.y) / 2 - (b.x - a.x) * 0.3;
+    // ============================================================
+    // ציור תפר-אחר-תפר
+    // כל אלמנט מתחיל להצטייר בנקודת זמן שונה (stagger)
+    // כך כולם מצטיירים בו-זמנית אבל לא מסונכרנים בדיוק
+    // ============================================================
+    const embProgress = Math.max(0, (progress - 0.1) / 0.9);
 
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.quadraticCurveTo(cpX, cpY, b.x, b.y);
-        ctx.stroke();
+    elements.forEach((el, idx) => {
+        // כל אלמנט מתחיל בין 0 ל-20% אחרי הקודם
+        const startOffset = (idx / elements.length) * 0.2;
+        const localP = Math.max(0, Math.min(1,
+            (embProgress - startOffset) / (1 - startOffset)
+        ));
+        if (localP <= 0) return;
 
-        ctx.beginPath();
-        ctx.arc(a.x, a.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(26, 18, 8, 0.15)';
-        ctx.fill();
-    }
+        const strokes   = el.strokes;
+        const totalCmds = strokes.length;
+        const visibleF  = localP * totalCmds;
+        const visibleI  = Math.floor(visibleF);
+        const subP      = visibleF - visibleI;
 
-    const florals = Math.floor(5 * progress);
-    for (let f = 0; f < florals; f++) {
-        drawFineLineFloral(
-            anchors[f * 2 % anchors.length].x,
-            anchors[f * 2 % anchors.length].y,
-            30 + f * 10
-        );
-    }
+        ctx.strokeStyle = INK;
+        ctx.fillStyle   = INK;
 
-    ctx.restore();
-}
+        for (let i = 0; i <= Math.min(visibleI, totalCmds - 1); i++) {
+            const cmd    = strokes[i];
+            const isLast = (i === visibleI);
+            const frac   = isLast ? subP : 1;
 
-function drawFineLineFloral(cx, cy, size) {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(26, 18, 8, 0.1)';
-    ctx.lineWidth   = 0.6;
+            if (cmd.t === 'move') {
+                ctx.beginPath();
+                ctx.moveTo(cmd.x, cmd.y);
 
-    for (let p = 0; p < 5; p++) {
-        const angle = (p / 5) * Math.PI * 2;
-        const x = cx + Math.cos(angle) * size;
-        const y = cy + Math.sin(angle) * size;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.bezierCurveTo(
-            cx + Math.cos(angle - 0.5) * size * 0.6,
-            cy + Math.sin(angle - 0.5) * size * 0.6,
-            cx + Math.cos(angle + 0.5) * size * 0.6,
-            cy + Math.sin(angle + 0.5) * size * 0.6,
-            x, y
-        );
-        ctx.stroke();
-    }
+            } else if (cmd.t === 'line') {
+                const prev = strokes[i - 1];
+                const tx   = prev.x + (cmd.x - prev.x) * frac;
+                const ty   = prev.y + (cmd.y - prev.y) * frac;
+                ctx.lineWidth = 1.5;
+                ctx.lineTo(tx, ty);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(tx, ty);
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, size * 0.15, 0, Math.PI * 2);
-    ctx.stroke();
+            } else if (cmd.t === 'arc') {
+                if (!isLast || frac > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(cmd.x, cmd.y, cmd.r, 0, Math.PI * 2);
+                    if (cmd.fill) {
+                        ctx.fill();
+                    } else {
+                        ctx.lineWidth = 1.3;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+    });
+
     ctx.restore();
 }
 
