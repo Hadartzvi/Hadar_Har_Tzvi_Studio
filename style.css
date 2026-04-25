@@ -74,6 +74,12 @@ html {
     scroll-behavior: smooth;
     font-size: 16px;
 }
+@media (hover: none) {
+    /* מובייל — אין עכבר, מסתירים הכל */
+    #custom-cursor { display: none; }
+    * { cursor: auto !important; }
+    html { cursor: auto; }
+}
 
 body {
     font-family: var(--font-body);
@@ -616,6 +622,31 @@ body.tattoo-mode .tattoo-content { display: block; }
     margin-left: auto;
     margin-right: auto;
 }
+@media (max-width: 768px) {
+    .products-grid {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: visible;
+        gap: 16px;
+        padding: 10px 5% 20px;
+        max-width: 100%;
+        /* גלילה חלקה על מובייל */
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        /* מסתירים סרגל גלילה */
+        scrollbar-width: none;
+    }
+    .products-grid::-webkit-scrollbar {
+        display: none;
+    }
+    .product {
+        /* כל מוצר בגודל קבוע */
+        flex: 0 0 72vw;
+        max-width: 300px;
+        scroll-snap-align: start;
+    }
+}
 
 .product {
     flex-direction: column;
@@ -991,4 +1022,55 @@ body.tattoo-mode .cta-btn:hover {
     .switcher-divider { display: none; }
     .gallery-grid { grid-template-columns: 1fr 1fr; }
     .products-grid { grid-template-columns: 1fr; }
+}
+/* מובייל — תפריט תחתון */
+.mobile-nav { display: none; }
+
+@media (max-width: 768px) {
+    #fab-menu { display: none; }
+
+    .mode-switcher {
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        z-index: 1000;
+        border-top: 1px solid var(--card-border);
+        border-bottom: none;
+        padding: 0;
+    }
+
+    .btn-mode {
+        padding: 18px 20px;
+        font-size: 0.85rem;
+        flex: 1;
+    }
+
+    .mobile-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 58px;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        background: var(--nav-bg);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--card-border);
+        justify-content: space-around;
+        padding: 10px 5%;
+    }
+
+    .mobile-nav a {
+        color: var(--text-main);
+        font-family: var(--font-body);
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        padding: 4px 0;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .mobile-nav a:hover { opacity: 1; }
+
+    main { padding-bottom: 120px; }
 }
