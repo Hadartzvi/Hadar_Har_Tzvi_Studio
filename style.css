@@ -174,6 +174,7 @@ li {
     z-index: 999999;
     transform: translate(-50%, -50%);
     will-change: left, top;
+    opacity: 0;
 }
 
 /* סאשיקו — עיגול מקווקו + נקודה */
@@ -1007,42 +1008,19 @@ body.tattoo-mode .cta-btn:hover {
     animation: pulse-accent 2s infinite;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .content-area { padding: 60px 5%; }
-    .about-container { grid-template-columns: 1fr; gap: 40px; }
-    .modal-content { grid-template-columns: 1fr; }
-    .courses-grid { grid-template-columns: 1fr; }
-    #main-title { font-size: clamp(3.5rem, 15vw, 7rem); }
-    .btn-mode { padding: 14px 20px; font-size: 0.8rem; }
-}
+/* =====  Responsive  ===== */
 
-@media (max-width: 480px) {
-    .mode-switcher { flex-wrap: wrap; }
-    .switcher-divider { display: none; }
-    .gallery-grid { grid-template-columns: 1fr 1fr; }
-    .products-grid { grid-template-columns: 1fr; }
-}
+.mobile-nav { display: none; }
+
 @media (max-width: 768px) {
+
+    /* --- ניווט --- */
     #fab-menu { display: none; }
-
-.mode-switcher {
-        position: sticky;
-        top: 48px; /* גובה ה-mobile-nav */
-        bottom: auto;
-        z-index: 1000;
-        border-top: none;
-        border-bottom: 1px solid var(--card-border);
-        padding: 0;
-        flex-direction: row; /* אחד ליד השני */
-        gap: 0;
-    }
 
     .mobile-nav {
         display: flex !important;
         position: fixed;
         top: 0;
-        order: -1;
         left: 0;
         right: 0;
         z-index: 1001;
@@ -1066,14 +1044,56 @@ body.tattoo-mode .cta-btn:hover {
 
     .mobile-nav a:hover { opacity: 1; }
 
+    /* כפתורי מעבר — מתחת לניווט, דביקים */
+    .mode-switcher {
+        position: sticky;
+        top: 44px;
+        z-index: 1000;
+        flex-direction: row;
+        border-top: none;
+        border-bottom: 1px solid var(--card-border);
+        padding: 0;
+    }
+
     .btn-mode {
         padding: 14px 20px;
         font-size: 0.8rem;
         flex: 1;
     }
 
-    main { padding-bottom: 40px; }
-}
-header#hero {
-        padding-top: 100px; /* גובה שני הפסים ביחד */
+    /* ריווח עליון לתוכן */
+    #hero {
+        padding-top: 110px;
     }
+
+    /* --- כללי --- */
+    .content-area { padding: 60px 5%; }
+    .about-container { grid-template-columns: 1fr; gap: 40px; }
+    .modal-content { grid-template-columns: 1fr; }
+    .courses-grid { grid-template-columns: 1fr; }
+    #main-title { font-size: clamp(3.5rem, 15vw, 7rem); }
+
+    /* --- חנות — גלילה אופקית --- */
+    .products-grid {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 16px;
+        padding: 10px 5% 20px;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        justify-content: flex-start;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .products-grid::-webkit-scrollbar { display: none; }
+
+    .product {
+        flex: 0 0 72vw;
+        max-width: 300px;
+        scroll-snap-align: start;
+    }
+}

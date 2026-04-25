@@ -43,7 +43,7 @@ const PRODUCTS_DATA = {
         title: 'הדפס Fine Line — סדרה מוגבלת',
         desc: 'מוּדפס דיגיטלית על נייר ארש 300 גרם. חתום ונוּמר. מהדורה של 50 עותקים בלבד. מגיע ממוסגר.',
         price: '120 ₪',
-        images: ['images/print1.jpg', 'images/print1-detail.jpg'],
+        images: ['images/print1.jpg'],
     },
     lino: {
         title: 'הדפס לינולאום בעבודת יד',
@@ -51,11 +51,11 @@ const PRODUCTS_DATA = {
         price: '90 ₪',
         images: ['images/lino.jpg'],
     },
-    notebook: {
-        title: 'מחברת סקיצות מעוצבת',
-        desc: 'כריכה קשה, 200 עמודים של נייר DOT GRID. עיצוב משולב — חצי צד בהשראת סאשיקו, חצי בהשראת Fine Line.',
-        price: '65 ₪',
-        images: ['images/notebook.jpg'],
+    shirt1: {
+        title: 'חולצה רקומה',
+        desc: 'חולצה ממוחדשת עם רקמה מסורתית של תפרי אורז בקצה השרוולים',
+        price: '75 ₪',
+        images: ['images/shirt1.jpeg', 'images/shirt1-detail.jpeg'],
     },
 };
 
@@ -71,8 +71,9 @@ const cursor = document.getElementById('custom-cursor');
 
 document.addEventListener('mousemove', (e) => {
     if (cursor) {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
+        cursor.style.left    = e.clientX + 'px';
+        cursor.style.top     = e.clientY + 'px';
+        cursor.style.opacity = '1';
     }
 });
 
@@ -888,7 +889,7 @@ function openProduct(articleEl) {
     document.getElementById('modal-price').textContent = data.price;
 
     const msg = encodeURIComponent(`שלום הדר! אני מעוניינת לשמוע עוד על "${data.title}"`);
-    document.getElementById('modal-contact').href = `https://wa.me/972XXXXXXXXX?text=${msg}`;
+    document.getElementById('modal-contact').href = `https://wa.me/9725800032?text=${msg}`;
 
     modalImages       = data.images || [];
     modalCurrentIndex = 0;
