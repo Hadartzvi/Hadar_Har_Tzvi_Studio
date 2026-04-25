@@ -3,7 +3,7 @@ A personal portfolio website built with HTML, CSS, and JavaScript.
 
 ## About
 This is the personal website of Hadar — a sashiko embroidery artist and fine line tattoo artist.  
-The site presents two distinct creative worlds under one roof, with an animated transition between them.  
+The site presents two distinct creative worlds under one roof.  
 Built from scratch with a minimal, craft-inspired aesthetic featuring live-drawn embroidery patterns, botanical ink illustrations, and a custom cursor.
 
 ## Sections
@@ -17,7 +17,7 @@ No installation needed. Just open `index.html` in any browser.
 
 Or clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git clone https://github.com/Hadartzvi/Hadar_Har_Tzvi_Studio
 cd YOUR_REPO
 open index.html
 ```
@@ -31,10 +31,5 @@ open index.html
 - Google Fonts — Cormorant Garamond + Noto Serif Hebrew
 
 ## Live Site
-[your-domain.com](http://your-domain.com)
+[your-domain.com](https://hadartzvi.github.io/Hadar_Har_Tzvi_Studio/)
 
-## Before Going Live 🪡
-Replace the placeholder phone number in `script.js`:
-```
-972XXXXXXXXX → your number in international format
-```
