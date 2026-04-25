@@ -731,89 +731,76 @@ function drawBackground(progress) {
 
 
 /* ============================================================
-   4. Honeycomb - מעבר בין מצבים
+   4. Fade — מעבר בין מצבים
    ============================================================ */
 
-const honeycombOverlay = document.getElementById('honeycomb-overlay');
-const honeycombGrid    = document.getElementById('honeycomb-grid');
-const HEX_SIZE         = 80;
+const fadeOverlay = document.getElementById('fade-overlay');
+let hAnimating = false;
 
-function buildHoneycomb() {
-    const W    = window.innerWidth;
-    const H    = window.innerHeight;
-    const cols = Math.ceil(W / HEX_SIZE) + 2;
-    const rows = Math.ceil(H / (HEX_SIZE * 0.866)) + 2;
+/*
+  המעבר עובד בשלושה שלבים:
+  1. fade out — האתר הנוכחי נעלם (0.5s)
+  2. החלפת המצב — body class מתחלף בזמן שהמסך שחור
+  3. fade in — האתר החדש מופיע (0.5s)
+  
+  הצבע שמכסה = צבע הרקע של המצב החדש,
+  כך שה-fade נראה כמו כניסה טבעית לעולם אחר.
+*/
+function triggerFade(onMidpoint) {
+    if (hAnimating) return;
+    hAnimating = true;
 
-    honeycombOverlay.classList.remove('active');
-    honeycombGrid.innerHTML = '';
+    // מציגים ומדהירים
+    fadeOverlay.style.visibility = 'visible';
+    fadeOverlay.style.opacity    = '0';
+    fadeOverlay.style.pointerEvents = 'all';
 
-    honeycombGrid.style.gridTemplateColumns = `repeat(${cols}, ${HEX_SIZE}px)`;
-    honeycombGrid.style.gridTemplateRows    = `repeat(${rows}, ${HEX_SIZE * 0.866}px)`;
-
-    for (let i = 0; i < cols * rows; i++) {
-        const hex   = document.createElement('div');
-        hex.className = 'hexagon';
-        hex.appendChild(Object.assign(document.createElement('div'), { className: 'hex-face hex-front' }));
-        hex.appendChild(Object.assign(document.createElement('div'), { className: 'hex-face hex-back'  }));
-
-        const row = Math.floor(i / cols);
-        const col = i % cols;
-
-        if (row % 2 === 1) hex.style.marginRight = `-${HEX_SIZE / 2}px`;
-
-        const dist = Math.sqrt(Math.pow(col - cols / 2, 2) + Math.pow(row - rows / 2, 2));
-        hex.style.transitionDelay = `${dist * 0.025}s`;
-
-        honeycombGrid.appendChild(hex);
-    }
-}
-
-function triggerHoneycomb(onComplete) {
-    buildHoneycomb();
-    honeycombOverlay.classList.add('active');
-
+    // ממתינים frame אחד כדי שה-transition יפעל
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            const hexagons = honeycombGrid.querySelectorAll('.hexagon');
-            hexagons.forEach(h => h.classList.add('flipped'));
+            fadeOverlay.style.opacity = '1';
 
-            const maxDelay = Math.max(
-                ...Array.from(hexagons).map(h => parseFloat(h.style.transitionDelay) || 0)
-            );
-
+            // אחרי ה-fade out — מחליפים מצב
             setTimeout(() => {
-                if (onComplete) onComplete();
-                setTimeout(() => {
-                    hexagons.forEach(h => h.classList.remove('flipped'));
-                    honeycombOverlay.classList.remove('active');
-                }, 300);
-            }, (maxDelay + 0.6) * 1000);
+                if (onMidpoint) onMidpoint();
+
+                // fade in
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        fadeOverlay.style.opacity = '0';
+
+                        setTimeout(() => {
+                            fadeOverlay.style.visibility = 'hidden';
+                            fadeOverlay.style.pointerEvents = 'none';
+                            hAnimating = false;
+                        }, 600);
+                    });
+                });
+            }, 600);
         });
     });
 }
-
-
 /* ============================================================
    5. setMode()
    ============================================================ */
-
 function setMode(modeName) {
-    if (modeName === currentMode) return;
+    if (modeName === currentMode || hAnimating) return;
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const targetMode = modeName;
 
-    triggerHoneycomb(() => {
-        currentMode = modeName;
-        document.body.className = modeName + '-mode';
-        document.body.setAttribute('data-mode', modeName);
+    triggerFade(() => {
+        currentMode = targetMode;
+        document.body.className = targetMode + '-mode';
+        document.body.setAttribute('data-mode', targetMode);
+        localStorage.setItem('studioMode', targetMode);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         scrollProgress = 0;
-        updateShopIntro(modeName);
-        document.getElementById('btn-sashiko').classList.toggle('active', modeName === 'sashiko');
-        document.getElementById('btn-tattoo').classList.toggle('active',  modeName === 'tattoo');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        updateShopIntro(targetMode);
+        document.getElementById('btn-sashiko').classList.toggle('active', targetMode === 'sashiko');
+        document.getElementById('btn-tattoo').classList.toggle('active',  targetMode === 'tattoo');
     });
 }
-
 function updateShopIntro(mode) {
     const intro = document.querySelector('.shop-intro');
     if (intro) {
@@ -821,6 +808,47 @@ function updateShopIntro(mode) {
             ? 'ערכות, בגדים ואביזרים ברוח הרקמה היפנית.'
             : 'הדפסים, סקיצות ואביזרים לאמנות הקעקוע.';
     }
+    // עדכון החנות — תיעדוף + הגבלת 3 פריטים
+    updateShop(mode);
+}
+/*
+  updateShop — מסדרת את המוצרים לפי מצב.
+  
+  הלוגיקה:
+  1. כל המוצרים מוצגים תמיד (לא מסתירים כלום).
+  2. מוצרים רלוונטיים למצב הנוכחי = "ראשוניים".
+  3. מוצרים משותפים = "משניים".
+  4. מוצרים של המצב השני = "שלישיים".
+  5. ממיינים את הגריד לפי הסדר הזה.
+  6. מציגים רק 3 ראשונים — השאר מוסתרים.
+  
+  order = מספר סדר ב-CSS Grid (order property).
+  גבוה יותר = מופיע אחר כך.
+*/
+function updateShop(mode) {
+    const grid     = document.getElementById('products-grid');
+    if (!grid) return;
+
+    const products = Array.from(grid.querySelectorAll('.product'));
+
+    // --- שלב 1: קובעים סדר לפי מצב ---
+    products.forEach(p => {
+        const cat = p.getAttribute('data-category');
+
+        let order;
+        if (cat === mode) {
+            order = 1;  // ראשוני — קשור למצב הנוכחי
+        } else if (cat === 'shared') {
+            order = 2;  // משותף — מופיע שני
+        } else {
+            order = 3;  // של המצב השני — מופיע אחרון
+        }
+
+        p.style.order = order;
+    });
+    products.forEach(p => p.style.display = 'flex');
+
+    
 }
 
 
@@ -939,10 +967,20 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeCanvas();
     window.addEventListener('resize', () => { resizeCanvas(); drawBackground(scrollProgress); });
 
-    initReveal();
-    updateShopIntro(currentMode);
-    drawBackground(0);
-    document.getElementById('btn-sashiko').classList.add('active');
+ // שחזור המצב השמור — אם המשתמש היה בקעקועים, חוזרים לשם
+const savedMode = localStorage.getItem('studioMode') || 'sashiko';
+if (savedMode !== 'sashiko') {
+    currentMode = savedMode;
+    document.body.className = savedMode + '-mode';
+    document.body.setAttribute('data-mode', savedMode);
+}
+
+initReveal();
+updateShopIntro(currentMode);
+drawBackground(0);
+
+document.getElementById('btn-sashiko').classList.toggle('active', currentMode === 'sashiko');
+document.getElementById('btn-tattoo').classList.toggle('active',  currentMode === 'tattoo');
 
     console.log('✦ סטודיו הדר - האתר נטען בהצלחה ✦');
 });
