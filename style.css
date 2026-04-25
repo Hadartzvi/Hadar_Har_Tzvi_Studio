@@ -164,19 +164,26 @@ li {
     position: fixed;
     width: 36px;
     height: 36px;
-    background-image: var(--cursor-img);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: transparent;
     pointer-events: none;
     z-index: 999999;
     transform: translate(-50%, -50%);
-    transition: 
-        background-image 0.3s,
-        transform 0.1s;
-    /* תנועה חלקה יותר */
     will-change: left, top;
+}
+
+/* סאשיקו — עיגול מקווקו + נקודה */
+body.sashiko-mode #custom-cursor {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='14' fill='none' stroke='%23c9a96e' stroke-width='1.4' stroke-dasharray='3,3'/%3E%3Ccircle cx='18' cy='18' r='3' fill='%23c9a96e'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* קעקועים — עיגול רציף + נקודה */
+body.tattoo-mode #custom-cursor {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='14' fill='none' stroke='%231a1208' stroke-width='1.4'/%3E%3Ccircle cx='18' cy='18' r='3' fill='%231a1208'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 /* אנימציית לחיצה - טיפת דיו / פרח */
@@ -206,8 +213,8 @@ li {
 
 /* טיפת דיו - SVG קטן שנוצר ב-JS */
 .ink-drop {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
 }
 
 /* פרח תפור - SVG קטן שנוצר ב-JS */

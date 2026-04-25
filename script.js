@@ -102,13 +102,13 @@ document.addEventListener('click', (e) => {
                 <circle cx="6"  cy="25" r="3" stroke="#c9a96e" stroke-width="1.5" fill="none"/>
                 <circle cx="44" cy="25" r="3" stroke="#c9a96e" stroke-width="1.5" fill="none"/>
             </svg>`;
-    } else {
+   } else {
         el.classList.add('ink-drop');
         el.innerHTML = `
-            <svg viewBox="0 0 40 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 2 C20 2, 35 20, 35 32 C35 41.2 28.3 48 20 48 C11.7 48 5 41.2 5 32 C5 20 20 2 20 2Z"
-                      fill="#1a1208" fill-opacity="0.85"/>
-                <ellipse cx="15" cy="22" rx="3" ry="5" fill="white" fill-opacity="0.25" transform="rotate(-20 15 22)"/>
+            <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="25" cy="25" r="8"  stroke="#1a1208" stroke-width="1.4" opacity="0.9"/>
+                <circle cx="25" cy="25" r="16" stroke="#1a1208" stroke-width="1.0" opacity="0.55"/>
+                <circle cx="25" cy="25" r="23" stroke="#1a1208" stroke-width="0.7" opacity="0.25"/>
             </svg>`;
     }
 
