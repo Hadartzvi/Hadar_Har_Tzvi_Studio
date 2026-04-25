@@ -21,11 +21,11 @@
 let currentMode = 'sashiko';
 
 const PRODUCTS_DATA = {
-    kit: {
-        title: 'ערכת DIY סאשיקו',
-        desc: 'כל מה שצריך כדי להתחיל: בד אינדיגו מסורתי, חוט לבן, מחט סאשיקו, מסגרת עגולה וחוברת מדריך מצולמת בעברית. מתנה מושלמת.',
+    shorst: {
+        title: 'מכנס קצר רקום',
+        desc: 'מכנס קצר מכותנה, ממוחדש ברקמה מסורתית עבודת יד',
         price: '150 ₪',
-        images: ['images/kit.jpg', 'images/kit-detail.jpg', 'images/kit-open.jpg'],
+        images: ['images/shorts.jpeg', 'images/shorts-detail.jpeg'],
     },
     bag: {
         title: 'תיק יד רקום',

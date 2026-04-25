@@ -258,8 +258,8 @@ li {
 */
 #fab-menu {
     position: fixed;
-    bottom: 30px;
-    left: 30px; /* RTL - שמאל זה ימין בפועל */
+    top: 70px;
+    right: 30px; /* RTL - שמאל זה ימין בפועל */
     z-index: 8000;
     display: flex;
     flex-direction: column;
@@ -268,24 +268,27 @@ li {
 }
 
 #fab-toggle {
-    width: 54px;
-    height: 54px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 1px solid var(--accent);
     background: var(--nav-bg);
     color: var(--text-main);
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: 
-        background var(--transition-speed),
-        transform 0.3s;
+    transition: background 0.25s, transform 0.12s;
     backdrop-filter: blur(10px);
 }
 
 #fab-toggle:hover {
-    transform: scale(1.1);
+    background: var(--accent);
+    color: var(--btn-text);
+}
+
+#fab-toggle:active {
+    transform: scale(0.93);
 }
 
 .fab-icon {
@@ -331,21 +334,29 @@ li {
 }
 
 .fab-link {
-    display: block;
-    padding: 8px 16px;
-    background: var(--nav-bg);
-    border: 1px solid var(--card-border);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    background: transparent;
+    border: 1px solid var(--accent);
     color: var(--text-main);
     font-family: var(--font-body);
-    font-size: 0.85rem;
-    border-radius: 4px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
     white-space: nowrap;
-    transition: background 0.2s;
     backdrop-filter: blur(10px);
+    transition: background 0.25s, color 0.25s, transform 0.12s;
 }
 
 .fab-link:hover {
-    background: var(--accent-soft);
+    background: var(--accent);
+    color: var(--btn-text);
+}
+
+.fab-link:active {
+    transform: scale(0.93);
 }
 
 /* הצגה/הסתרה לפי מצב */
