@@ -889,7 +889,7 @@ function openProduct(articleEl) {
     document.getElementById('modal-price').textContent = data.price;
 
     const msg = encodeURIComponent(`שלום הדר! אני מעוניינת לשמוע עוד על "${data.title}"`);
-    document.getElementById('modal-contact').href = `https://wa.me/9725800032?text=${msg}`;
+    document.getElementById('modal-contact').href = `https://wa.me/972545800032?text=${msg}`;
 
     modalImages       = data.images || [];
     modalCurrentIndex = 0;
