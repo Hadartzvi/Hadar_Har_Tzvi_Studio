@@ -772,7 +772,7 @@ body.tattoo-mode .cta-btn:hover {
     width: 100%;
     object-fit: cover;
     aspect-ratio: 3/4;
-    filter: grayscale(30%);
+    filter: grayscale(0%);
     transition: filter 0.5s;
 }
 

@@ -21,7 +21,7 @@
 let currentMode = 'sashiko';
 
 const PRODUCTS_DATA = {
-    shorst: {
+    shorts: {
         title: 'מכנס קצר רקום',
         desc: 'מכנס קצר מכותנה, ממוחדש ברקמה מסורתית עבודת יד',
         price: '150 ₪',
