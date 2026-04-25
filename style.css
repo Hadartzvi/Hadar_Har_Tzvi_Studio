@@ -1026,21 +1026,21 @@ body.tattoo-mode .cta-btn:hover {
 @media (max-width: 768px) {
     #fab-menu { display: none; }
 
-    .mode-switcher {
+.mode-switcher {
         position: sticky;
-        top: 0;
+        top: 48px; /* גובה ה-mobile-nav */
         bottom: auto;
         z-index: 1000;
         border-top: none;
         border-bottom: 1px solid var(--card-border);
         padding: 0;
-        flex-direction: column;
+        flex-direction: row; /* אחד ליד השני */
         gap: 0;
     }
 
     .mobile-nav {
         display: flex !important;
-        position: sticky;
+        position: fixed;
         top: 0;
         order: -1;
         left: 0;
@@ -1074,3 +1074,6 @@ body.tattoo-mode .cta-btn:hover {
 
     main { padding-bottom: 40px; }
 }
+header#hero {
+        padding-top: 100px; /* גובה שני הפסים ביחד */
+    }
